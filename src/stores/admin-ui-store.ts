@@ -1,11 +1,6 @@
 import { create } from "zustand";
 
-type AdminUiStore = {
-  sidebarOpen: boolean;
-  setSidebarOpen: (open: boolean) => void;
-  toggleSidebar: () => void;
-  reset: () => void;
-};
+import type { AdminUiStore } from "@/types/stores/admin-ui-store";
 
 const initialState = {
   sidebarOpen: true,
