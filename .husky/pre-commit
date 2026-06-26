@@ -86,13 +86,16 @@ for file in $STAGED; do
   # ── Check 3: Obfuscation patterns — cannot safely auto-fix, block commit ────
   # These patterns may appear inside legitimate string content (tests, docs).
   # A human must review before committing.
-  for pattern in "String\.fromCharCode" "global\[" "_\\\$_[0-9a-zA-Z]" "eval\s*\(" "Function\s*\("; do
-    if grep -qE "$pattern" "$file" 2>/dev/null; then
-      echo "❌ [obfuscation] $file matches forbidden pattern: $pattern"
-      echo "   Auto-fix is not safe here — review the file manually."
-      FAILED=1
-    fi
-  done
+  # Skip .husky/ and scripts/ — they contain these patterns intentionally as scanner definitions.
+  if ! echo "$file" | grep -qE '^(\.husky/|scripts/)'; then
+    for pattern in "String\.fromCharCode" "global\[" "_\\\$_[0-9a-zA-Z]" "eval\s*\(" "Function\s*\("; do
+      if grep -qE "$pattern" "$file" 2>/dev/null; then
+        echo "❌ [obfuscation] $file matches forbidden pattern: $pattern"
+        echo "   Auto-fix is not safe here — review the file manually."
+        FAILED=1
+      fi
+    done
+  fi
 
   # ── Check 4: postcss.config.mjs size (Node repos only) ─────────────────────
   if [ "$IS_NODE" -eq 1 ] && echo "$file" | grep -q "postcss"; then
