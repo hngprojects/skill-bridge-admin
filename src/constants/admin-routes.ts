@@ -21,4 +21,5 @@ export const ROUTES = {
   support: "/support",
   settings: "/settings",
   adminManagement: "/admin-management",
+  notifications: "/notifications",
 } as const;
