@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -11,7 +10,9 @@ import {
 } from "@/components/ui/select";
 import { TALENT_TRACKS } from "@/types/api/talents";
 import type { TalentTier } from "@/types/api/talents";
+import { DateRangeInput } from "./date-range-input";
 import { FilterChip } from "./filter-chip";
+import { ScoreRangeInput } from "./score-range-input";
 
 export type ScoreRange = { min: string; max: string };
 export type DateRange = { from: string; to: string };
@@ -87,53 +88,9 @@ export function TalentsFilters({
           </SelectContent>
         </Select>
 
-        {/* Score range */}
-        <div className="flex items-center gap-1.5">
-          <Input
-            type="number"
-            placeholder="Min score"
-            min={0}
-            max={100}
-            value={scoreRange.min}
-            onChange={(e) =>
-              onScoreRangeChange({ ...scoreRange, min: e.target.value })
-            }
-            className="h-8 w-24 rounded-full text-sm"
-          />
-          <span className="text-xs text-muted-foreground">–</span>
-          <Input
-            type="number"
-            placeholder="Max score"
-            min={0}
-            max={100}
-            value={scoreRange.max}
-            onChange={(e) =>
-              onScoreRangeChange({ ...scoreRange, max: e.target.value })
-            }
-            className="h-8 w-24 rounded-full text-sm"
-          />
-        </div>
+        <ScoreRangeInput value={scoreRange} onChange={onScoreRangeChange} />
 
-        {/* Date range */}
-        <div className="flex items-center gap-1.5">
-          <Input
-            type="date"
-            value={dateRange.from}
-            onChange={(e) =>
-              onDateRangeChange({ ...dateRange, from: e.target.value })
-            }
-            className="h-8 w-36 rounded-full text-sm"
-          />
-          <span className="text-xs text-muted-foreground">–</span>
-          <Input
-            type="date"
-            value={dateRange.to}
-            onChange={(e) =>
-              onDateRangeChange({ ...dateRange, to: e.target.value })
-            }
-            className="h-8 w-36 rounded-full text-sm"
-          />
-        </div>
+        <DateRangeInput value={dateRange} onChange={onDateRangeChange} />
       </div>
 
       {/* Active chips */}
