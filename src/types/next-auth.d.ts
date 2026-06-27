@@ -1,8 +1,10 @@
 import type { DefaultSession } from "next-auth";
 
+import type { AdminRole } from "@/types/api/auth";
+
 type SessionUserDetails = {
   id?: string;
-  role?: "talent" | "employer" | "admin";
+  role?: AdminRole;
 };
 
 declare module "next-auth" {
@@ -13,14 +15,14 @@ declare module "next-auth" {
 
   interface User {
     accessToken?: string;
-    role?: SessionUserDetails["role"];
+    role?: AdminRole;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     accessToken?: string;
-    role?: SessionUserDetails["role"];
+    role?: AdminRole;
   }
 }
 
@@ -31,13 +33,13 @@ declare module "@auth/core/types" {
 
   interface User {
     accessToken?: string;
-    role?: SessionUserDetails["role"];
+    role?: AdminRole;
   }
 }
 
 declare module "@auth/core/jwt" {
   interface JWT {
     accessToken?: string;
-    role?: SessionUserDetails["role"];
+    role?: AdminRole;
   }
 }

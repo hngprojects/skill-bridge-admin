@@ -73,6 +73,15 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-landing-teal: var(--landing-teal);
+  --color-landing-purple: var(--landing-purple);
+  --color-landing-dark: var(--landing-dark);
+  --color-landing-track: var(--landing-track);
+  --color-landing-progress: var(--landing-progress);
+  --color-landing-hero-bg: var(--landing-hero-bg);
+  --color-landing-ink: var(--landing-ink);
+  --color-landing-nav: var(--landing-nav);
+  --color-landing-accent-orange: var(--landing-accent-orange);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -141,6 +150,16 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  --landing-teal: var(--primary-300);
+  --landing-purple: #cbb0eb;
+  --landing-dark: #1b2935;
+  --landing-track: #2e4252;
+  --landing-progress: #3a9ec5;
+  --landing-hero-bg: #efefef;
+  --landing-ink: #151515;
+  --landing-nav: #05060f;
+  --landing-accent-orange: #e29a4d;
 }
 
 @layer base {
