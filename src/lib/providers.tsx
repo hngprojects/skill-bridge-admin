@@ -10,6 +10,7 @@ import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
 
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { toasterConfig } from "@/lib/toast";
 
 function makeQueryClient() {
@@ -43,7 +44,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           enableSystem={false}
           disableTransitionOnChange
         >
-          {children}
+          <TooltipProvider>{children}</TooltipProvider>
           <Toaster {...toasterConfig} />
         </ThemeProvider>
       </QueryClientProvider>
