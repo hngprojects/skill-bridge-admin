@@ -1,7 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { AlertCircle, Eye, EyeOff } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  AlertCircleIcon,
+  EyeIcon,
+  EyeOffIcon,
+} from "@hugeicons/core-free-icons";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -97,7 +102,13 @@ function FormInput({
         {type === "password" ? (
           <div className="absolute inset-y-0 right-2 flex items-center gap-1">
             {hasError ? (
-              <AlertCircle className="size-4 text-error" aria-hidden="true" />
+              <HugeiconsIcon
+                icon={AlertCircleIcon}
+                size={16}
+                strokeWidth={1.5}
+                className="text-error"
+                aria-hidden
+              />
             ) : null}
             <button
               type="button"
@@ -106,9 +117,19 @@ function FormInput({
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
-                <EyeOff className="size-4" />
+                <HugeiconsIcon
+                  icon={EyeOffIcon}
+                  size={16}
+                  strokeWidth={1.5}
+                  aria-hidden
+                />
               ) : (
-                <Eye className="size-4" />
+                <HugeiconsIcon
+                  icon={EyeIcon}
+                  size={16}
+                  strokeWidth={1.5}
+                  aria-hidden
+                />
               )}
             </button>
           </div>

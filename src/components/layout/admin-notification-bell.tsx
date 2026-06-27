@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Bell } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Notification01Icon } from "@hugeicons/core-free-icons";
 
 import { AdminNotificationPreviewItem } from "@/components/notifications/admin-notification-preview-item";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,13 @@ export function AdminNotificationBell() {
             capped ? `Notifications, ${capped} unread` : "Notifications"
           }
         >
-          <Bell className="size-5 text-muted-foreground" aria-hidden />
+          <HugeiconsIcon
+            icon={Notification01Icon}
+            size={20}
+            strokeWidth={1.5}
+            className="text-muted-foreground"
+            aria-hidden
+          />
           {capped ? (
             <span
               aria-hidden

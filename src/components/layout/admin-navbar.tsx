@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { LogOut } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Logout01Icon } from "@hugeicons/core-free-icons";
 import { usePathname } from "next/navigation";
 
 import { AdminNavIcon } from "@/components/layout/admin-nav-icons";
@@ -120,7 +121,12 @@ export function AdminNavbar({ user }: AdminNavbarProps) {
               variant="destructive"
               onClick={() => void signOut({ callbackUrl: ROUTES.login })}
             >
-              <LogOut className="size-4" />
+              <HugeiconsIcon
+                icon={Logout01Icon}
+                size={16}
+                strokeWidth={1.5}
+                aria-hidden
+              />
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
