@@ -1,14 +1,14 @@
 import { toast, type ExternalToast, type ToasterProps } from "sonner";
 
 export const toastDurations = {
-  error: 6_000,
+  error: Infinity,
   warning: 5_000,
   success: 4_000,
 } as const;
 
 export const toasterConfig = {
   closeButton: true,
-  position: "bottom-right",
+  position: "top-right",
   richColors: true,
 } satisfies Partial<ToasterProps>;
 
