@@ -30,6 +30,11 @@ export const questionBankKeys = {
   aiLogs: () => [...questionBankKeys.all, "ai-logs"] as const,
 };
 
+export const supportKeys = {
+  all: ["support"] as const,
+  tickets: () => [...supportKeys.all, "tickets"] as const,
+};
+
 export const talentsKeys = {
   all: ["talents"] as const,
   lists: () => [...talentsKeys.all, "list"] as const,
