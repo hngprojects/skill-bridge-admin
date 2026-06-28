@@ -43,6 +43,16 @@ export const talentsKeys = {
   detail: (id: string) => [...talentsKeys.details(), id] as const,
 };
 
+export const paymentsKeys = {
+  all: ["payments"] as const,
+  stats: () => [...paymentsKeys.all, "stats"] as const,
+  revenue: (period: string) =>
+    [...paymentsKeys.all, "revenue", period] as const,
+  employerPackages: () => [...paymentsKeys.all, "employer-packages"] as const,
+  talentSubscription: () =>
+    [...paymentsKeys.all, "talent-subscription"] as const,
+  subscriptions: () => [...paymentsKeys.all, "subscriptions"] as const,
+  transactions: () => [...paymentsKeys.all, "transactions"] as const,
 export const offersKeys = {
   all: ["offers"] as const,
   stats: () => [...offersKeys.all, "stats"] as const,
