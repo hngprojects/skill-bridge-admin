@@ -63,3 +63,11 @@ export const employersKeys = {
   details: () => [...employersKeys.all, "detail"] as const,
   detail: (id: string) => [...employersKeys.details(), id] as const,
 };
+
+export const engagementKeys = {
+  all: ["engagement"] as const,
+  stats: () => [...engagementKeys.all, "stats"] as const,
+  retakeDropoff: () => [...engagementKeys.all, "retake-dropoff"] as const,
+  minorAssessmentUptake: (track = "all") =>
+    [...engagementKeys.all, "minor-assessment-uptake", track] as const,
+};
