@@ -131,7 +131,7 @@ export function DataTable<TData>({
         onClearAllFilters={() => setActiveFilters({})}
       />
 
-      <div className="overflow-hidden rounded-2xl ring-1 ring-foreground/10">
+      <div className="overflow-x-auto rounded-2xl ring-1 ring-foreground/10">
         <Table>
           <DataTableHeader table={table} />
 
