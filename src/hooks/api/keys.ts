@@ -42,3 +42,11 @@ export const talentsKeys = {
   details: () => [...talentsKeys.all, "detail"] as const,
   detail: (id: string) => [...talentsKeys.details(), id] as const,
 };
+
+export const employersKeys = {
+  all: ["employers"] as const,
+  lists: () => [...employersKeys.all, "list"] as const,
+  list: () => [...employersKeys.lists()] as const,
+  details: () => [...employersKeys.all, "detail"] as const,
+  detail: (id: string) => [...employersKeys.details(), id] as const,
+};
