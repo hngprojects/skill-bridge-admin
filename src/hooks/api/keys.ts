@@ -53,15 +53,36 @@ export const paymentsKeys = {
     [...paymentsKeys.all, "talent-subscription"] as const,
   subscriptions: () => [...paymentsKeys.all, "subscriptions"] as const,
   transactions: () => [...paymentsKeys.all, "transactions"] as const,
+export const offersKeys = {
+  all: ["offers"] as const,
+  stats: () => [...offersKeys.all, "stats"] as const,
+  funnel: () => [...offersKeys.all, "funnel"] as const,
+  lists: () => [...offersKeys.all, "list"] as const,
+  list: () => [...offersKeys.lists()] as const,
+};
+
 export const integrityKeys = {
   all: ["integrity"] as const,
   stats: () => [...integrityKeys.all, "stats"] as const,
   voidedAttempts: () => [...integrityKeys.all, "voided-attempts"] as const,
-        
+};
 export const employersKeys = {
   all: ["employers"] as const,
   lists: () => [...employersKeys.all, "list"] as const,
   list: () => [...employersKeys.lists()] as const,
   details: () => [...employersKeys.all, "detail"] as const,
   detail: (id: string) => [...employersKeys.details(), id] as const,
+};
+
+export const engagementKeys = {
+  all: ["engagement"] as const,
+  stats: () => [...engagementKeys.all, "stats"] as const,
+  retakeDropoff: () => [...engagementKeys.all, "retake-dropoff"] as const,
+  minorAssessmentUptake: (track = "all") =>
+    [...engagementKeys.all, "minor-assessment-uptake", track] as const,
+};
+
+export const adminManagementKeys = {
+  all: ["admin-management"] as const,
+  accounts: () => [...adminManagementKeys.all, "accounts"] as const,
 };

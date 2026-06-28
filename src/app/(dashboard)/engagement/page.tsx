@@ -1,5 +1,5 @@
-import { AdminPagePlaceholder } from "@/components/layout/admin-page-placeholder";
+import { EngagementShell } from "@/components/engagement/engagement-shell";
 
 export default function EngagementPage() {
-  return <AdminPagePlaceholder />;
+  return <EngagementShell />;
 }
