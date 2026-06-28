@@ -1,5 +1,5 @@
-import { AdminPagePlaceholder } from "@/components/layout/admin-page-placeholder";
+import { OffersShell } from "@/components/offers/offers-shell";
 
 export default function OffersPage() {
-  return <AdminPagePlaceholder />;
+  return <OffersShell />;
 }
