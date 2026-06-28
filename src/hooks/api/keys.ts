@@ -42,3 +42,11 @@ export const talentsKeys = {
   details: () => [...talentsKeys.all, "detail"] as const,
   detail: (id: string) => [...talentsKeys.details(), id] as const,
 };
+
+export const offersKeys = {
+  all: ["offers"] as const,
+  stats: () => [...offersKeys.all, "stats"] as const,
+  funnel: () => [...offersKeys.all, "funnel"] as const,
+  lists: () => [...offersKeys.all, "list"] as const,
+  list: () => [...offersKeys.lists()] as const,
+};
