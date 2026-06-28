@@ -37,3 +37,4 @@ export type {
   TalentStatus,
   EmployerStatus,
 } from "./overview";
+export type { IntegrityStats, VoidedAttempt } from "./integrity";

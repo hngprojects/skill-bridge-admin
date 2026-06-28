@@ -42,3 +42,9 @@ export const talentsKeys = {
   details: () => [...talentsKeys.all, "detail"] as const,
   detail: (id: string) => [...talentsKeys.details(), id] as const,
 };
+
+export const integrityKeys = {
+  all: ["integrity"] as const,
+  stats: () => [...integrityKeys.all, "stats"] as const,
+  voidedAttempts: () => [...integrityKeys.all, "voided-attempts"] as const,
+};
