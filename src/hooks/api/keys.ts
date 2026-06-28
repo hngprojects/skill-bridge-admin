@@ -71,3 +71,8 @@ export const engagementKeys = {
   minorAssessmentUptake: (track = "all") =>
     [...engagementKeys.all, "minor-assessment-uptake", track] as const,
 };
+
+export const adminManagementKeys = {
+  all: ["admin-management"] as const,
+  accounts: () => [...adminManagementKeys.all, "accounts"] as const,
+};
