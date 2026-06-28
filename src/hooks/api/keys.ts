@@ -22,6 +22,19 @@ export const overviewKeys = {
   newUsers: () => [...overviewKeys.all, "new-users"] as const,
 };
 
+export const questionBankKeys = {
+  all: ["question-bank"] as const,
+  health: () => [...questionBankKeys.all, "health"] as const,
+  questions: () => [...questionBankKeys.all, "questions"] as const,
+  qualityNotes: () => [...questionBankKeys.all, "quality-notes"] as const,
+  aiLogs: () => [...questionBankKeys.all, "ai-logs"] as const,
+};
+
+export const supportKeys = {
+  all: ["support"] as const,
+  tickets: () => [...supportKeys.all, "tickets"] as const,
+};
+
 export const talentsKeys = {
   all: ["talents"] as const,
   lists: () => [...talentsKeys.all, "list"] as const,
