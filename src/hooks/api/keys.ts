@@ -53,6 +53,8 @@ export const paymentsKeys = {
     [...paymentsKeys.all, "talent-subscription"] as const,
   subscriptions: () => [...paymentsKeys.all, "subscriptions"] as const,
   transactions: () => [...paymentsKeys.all, "transactions"] as const,
+};
+
 export const offersKeys = {
   all: ["offers"] as const,
   stats: () => [...offersKeys.all, "stats"] as const,
