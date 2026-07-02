@@ -7,6 +7,11 @@ import type {
   RefreshResponseData,
 } from "@/types/api/auth";
 import { publicApi } from "@/lib/api/clients";
+import {
+  parseSetCookieHeader,
+  persistServerCookies,
+  setCookieHeadersFrom,
+} from "@/lib/api/cookies";
 import { unwrapData } from "./utils";
 
 export async function login(body: LoginInput): Promise<LoginResponseData> {
@@ -14,6 +19,14 @@ export async function login(body: LoginInput): Promise<LoginResponseData> {
     "/admin/auth/login",
     body,
   );
+
+  // Forward API auth cookies (access_token, refresh_token, etc.) to the
+  // browser so subsequent server-action API calls can read and proxy them.
+  const cookies = setCookieHeadersFrom(res.headers)
+    .map(parseSetCookieHeader)
+    .filter((c): c is NonNullable<typeof c> => c != null);
+  await persistServerCookies(cookies);
+
   return unwrapData(res);
 }
 

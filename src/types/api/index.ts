@@ -7,11 +7,8 @@ export type {
 export type {
   AdminAuthUser,
   AdminRole,
-  AuthTokens,
-  LoginErrorCode,
   LoginInput,
   LoginResponseData,
-  LoginResult,
 } from "./auth";
 export type { RetriableRequestConfig, SetCookieHeaders } from "./client";
 export type { CookieSameSite, StoredCookie } from "./cookies";
@@ -44,12 +41,13 @@ export {
   EMPLOYER_REGIONS,
 } from "./employers";
 export type {
+  StatTrend,
+  StatMetric,
   OverviewStats,
   ScoreDistribution,
   ScoreDistributionBucket,
   AIConsumptionPeriod,
   AIConsumptionData,
-  AIConsumptionDataPoint,
   NewUser,
   NewUserType,
   NewUserStatus,

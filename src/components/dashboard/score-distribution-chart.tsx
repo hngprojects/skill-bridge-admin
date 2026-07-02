@@ -48,7 +48,8 @@ export function ScoreDistributionChart() {
   const [track, setTrack] = React.useState("all");
   const { data, isLoading } = useScoreDistribution(track);
 
-  const hasEnoughData = (data?.totalAssessments ?? 0) >= MIN_ASSESSMENTS;
+  const hasEnoughData =
+    !data?.empty && (data?.total_completed ?? 0) >= MIN_ASSESSMENTS;
 
   return (
     <Card>
