@@ -35,10 +35,11 @@ const columns: ColumnDef<NewUser>[] = [
     ),
   },
   {
-    accessorKey: "signupDate",
+    accessorKey: "signup_date",
     header: "Signup Date",
     enableSorting: true,
-    cell: ({ row }) => format(new Date(row.original.signupDate), "MMM d, yyyy"),
+    cell: ({ row }) =>
+      format(new Date(row.original.signup_date), "MMM d, yyyy"),
   },
   {
     accessorKey: "status",

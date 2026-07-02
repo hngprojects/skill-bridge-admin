@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { DataTable } from "@/components/shared/data-table";
 import { ROUTES } from "@/constants/admin-routes";
 import { useVoidedAttempts } from "@/hooks/api/use-integrity";
+import type { VoidedAttempt } from "@/types/api/integrity";
 import { voidedAttemptColumns } from "./columns";
 import { IntegrityFilters } from "./integrity-filters";
 import type { DateRange } from "./integrity-filters";
@@ -38,8 +39,8 @@ export function VoidedAttemptsTable() {
     setDateRange({ from: "", to: "" });
   }
 
-  function handleRowClick() {
-    router.push(ROUTES.talents);
+  function handleRowClick(attempt: VoidedAttempt) {
+    router.push(`${ROUTES.talents}?talent=${attempt.candidateId}`);
   }
 
   return (

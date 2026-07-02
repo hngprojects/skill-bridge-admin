@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { DataTable } from "@/components/shared/data-table";
 import { useTalents } from "@/hooks/api/use-talents";
@@ -11,6 +12,10 @@ import { TalentsFilters } from "./talents-filters";
 import type { DateRange, ScoreRange } from "./talents-filters";
 
 export function TalentsTable() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [trackFilter, setTrackFilter] = React.useState("");
   const [tierFilter, setTierFilter] = React.useState("");
   const [scoreRange, setScoreRange] = React.useState<ScoreRange>({
@@ -25,6 +30,17 @@ export function TalentsTable() {
   const [panelOpen, setPanelOpen] = React.useState(false);
 
   const { data: talents = [], isLoading } = useTalents();
+
+  // Open drawer when ?talent=<id> param is present (e.g. deep-link from voided attempts)
+  React.useEffect(() => {
+    const id = searchParams.get("talent");
+    if (!id) return;
+    function syncFromParam() {
+      setSelectedId(id);
+      setPanelOpen(true);
+    }
+    syncFromParam();
+  }, [searchParams]);
 
   const filtered = React.useMemo(() => {
     const minScore = scoreRange.min !== "" ? Number(scoreRange.min) : null;
@@ -52,6 +68,12 @@ export function TalentsTable() {
   function handleRowClick(talent: TalentListItem) {
     setSelectedId(talent.id);
     setPanelOpen(true);
+    router.replace(`${pathname}?talent=${talent.id}`);
+  }
+
+  function handlePanelOpenChange(open: boolean) {
+    setPanelOpen(open);
+    if (!open) router.replace(pathname);
   }
 
   function clearAllFilters() {
@@ -90,7 +112,7 @@ export function TalentsTable() {
       <CandidateDetailPanel
         talentId={selectedId}
         open={panelOpen}
-        onOpenChange={setPanelOpen}
+        onOpenChange={handlePanelOpenChange}
       />
     </div>
   );
