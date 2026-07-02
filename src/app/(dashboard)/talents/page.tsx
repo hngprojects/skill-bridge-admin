@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 
 import { TalentsTable } from "@/components/talents/talents-table";
@@ -16,7 +17,9 @@ export default function TalentsPage() {
         </p>
       </div>
 
-      <TalentsTable />
+      <Suspense>
+        <TalentsTable />
+      </Suspense>
     </div>
   );
 }
