@@ -10,6 +10,17 @@ const SECURITY_HEADERS: Record<string, string> = {
   "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
 };
 
+function applySecurityHeaders(
+  response: NextResponse,
+  requestId: string,
+): NextResponse {
+  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+    response.headers.set(key, value);
+  }
+  response.headers.set("x-request-id", requestId);
+  return response;
+}
+
 function continueWithSecurityHeaders(request: NextRequest): NextResponse {
   const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();
 
@@ -20,12 +31,7 @@ function continueWithSecurityHeaders(request: NextRequest): NextResponse {
     request: { headers: requestHeaders },
   });
 
-  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
-    response.headers.set(key, value);
-  }
-  response.headers.set("x-request-id", requestId);
-
-  return response;
+  return applySecurityHeaders(response, requestId);
 }
 
 function isAuthenticated(request: NextRequest): boolean {
@@ -38,6 +44,7 @@ function isAuthenticated(request: NextRequest): boolean {
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const authenticated = isAuthenticated(request);
+  const requestId = request.headers.get("x-request-id") ?? crypto.randomUUID();
 
   // NextAuth internal routes must always pass through
   if (pathname.startsWith("/api/auth/")) {
@@ -53,14 +60,16 @@ export function proxy(request: NextRequest) {
 
   // Authenticated user hitting login → send to dashboard
   if (authenticated && isAuthRoute) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    const res = NextResponse.redirect(new URL("/dashboard", request.url));
+    return applySecurityHeaders(res, requestId);
   }
 
   // Unauthenticated user hitting a protected route → send to login
   if (!authenticated && !isPublic) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
+    const res = NextResponse.redirect(loginUrl);
+    return applySecurityHeaders(res, requestId);
   }
 
   return continueWithSecurityHeaders(request);
