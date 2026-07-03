@@ -75,12 +75,30 @@ function buildDateParams(params?: OffersDateRangeParams) {
   return searchParams;
 }
 
-function trendToValue(trend?: ApiTrend): number {
-  if (!trend || trend.change_percent == null) return 0;
+function trendToValue(trend?: ApiTrend): number | undefined {
+  if (!trend || trend.change_percent == null || trend.direction == null) {
+    return undefined;
+  }
 
   return trend.direction === "down"
     ? -trend.change_percent
     : trend.change_percent;
+}
+
+function buildStatMetric(
+  value: number | string,
+  trend?: ApiTrend,
+): OffersStats["totalOffersSent"] {
+  const trendValue = trendToValue(trend);
+
+  if (trendValue === undefined) {
+    return { value };
+  }
+
+  return {
+    value,
+    trend: trendValue,
+  };
 }
 
 function formatAverageDays(value: number): string {
@@ -157,22 +175,22 @@ export async function getOffersStats(
   const data = unwrapData(res).data;
 
   return {
-    totalOffersSent: {
-      value: data.total_offers_sent.value,
-      trend: trendToValue(data.total_offers_sent.trend),
-    },
-    offerAcceptanceRate: {
-      value: data.offer_to_acceptance_rate.value,
-      trend: trendToValue(data.offer_to_acceptance_rate.trend),
-    },
-    offerToHireRate: {
-      value: data.offer_to_hire_rate.value,
-      trend: trendToValue(data.offer_to_hire_rate.trend),
-    },
-    averageTimeToHire: {
-      value: formatAverageDays(data.avg_time_offer_to_hire_days.value),
-      trend: trendToValue(data.avg_time_offer_to_hire_days.trend),
-    },
+    totalOffersSent: buildStatMetric(
+      data.total_offers_sent.value,
+      data.total_offers_sent.trend,
+    ),
+    offerAcceptanceRate: buildStatMetric(
+      data.offer_to_acceptance_rate.value,
+      data.offer_to_acceptance_rate.trend,
+    ),
+    offerToHireRate: buildStatMetric(
+      data.offer_to_hire_rate.value,
+      data.offer_to_hire_rate.trend,
+    ),
+    averageTimeToHire: buildStatMetric(
+      formatAverageDays(data.avg_time_offer_to_hire_days.value),
+      data.avg_time_offer_to_hire_days.trend,
+    ),
   };
 }
 
