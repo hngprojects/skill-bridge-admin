@@ -1,20 +1,10 @@
-import { differenceInMonths, formatDistanceToNowStrict } from "date-fns";
-
-export const ACCOUNT_AGE_BUCKETS = [
-  { value: "0-3", label: "0–3 months" },
-  { value: "3-6", label: "3–6 months" },
-  { value: "6-12", label: "6–12 months" },
-  { value: "12+", label: "1 year+" },
-] as const;
-
-export function formatAccountAge(signupDate: string): string {
-  return formatDistanceToNowStrict(new Date(signupDate));
-}
-
-export function getAccountAgeBucket(signupDate: string): string {
-  const months = differenceInMonths(new Date(), new Date(signupDate));
-  if (months < 3) return "0-3";
-  if (months < 6) return "3-6";
-  if (months < 12) return "6-12";
-  return "12+";
+export function formatAccountAgeDays(days: number): string {
+  if (days < 1) return "Today";
+  if (days < 30) return `${days} day${days === 1 ? "" : "s"}`;
+  if (days < 365) {
+    const months = Math.floor(days / 30);
+    return `${months} month${months === 1 ? "" : "s"}`;
+  }
+  const years = Math.floor(days / 365);
+  return `${years} year${years === 1 ? "" : "s"}`;
 }

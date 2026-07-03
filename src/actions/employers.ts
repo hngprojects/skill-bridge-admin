@@ -1,10 +1,29 @@
-import type { EmployerDetail, EmployerListItem } from "@/types/api/employers";
-import { getMockEmployerDetail, MOCK_EMPLOYERS } from "@/mocks/employers";
+"use server";
 
-export async function getEmployers(): Promise<EmployerListItem[]> {
-  return MOCK_EMPLOYERS;
+import type {
+  EmployerDetail,
+  EmployersPage,
+  EmployersQueryParams,
+  GetEmployerDetailResponse,
+  GetEmployersResponse,
+} from "@/types/api/employers";
+import { authApi } from "@/lib/api/clients";
+import { unwrapData } from "./utils";
+
+export async function getEmployers(
+  params: EmployersQueryParams = {},
+): Promise<EmployersPage> {
+  const res = await authApi.get<GetEmployersResponse>("/admin/employers", {
+    params,
+  });
+
+  return unwrapData(res).data;
 }
 
 export async function getEmployerDetail(id: string): Promise<EmployerDetail> {
-  return getMockEmployerDetail(id);
+  const res = await authApi.get<GetEmployerDetailResponse>(
+    `/admin/employers/${id}`,
+  );
+
+  return unwrapData(res).data;
 }

@@ -1,47 +1,28 @@
-import type { SubscriptionStatus } from "./talents";
+import type { ApiEnvelope } from "./common";
 
-export type EmployerVerificationStatus = "Verified" | "Pending" | "Unverified";
+export type Nested<T> = {
+  status: string;
+  data: T;
+};
 
-export const EMPLOYER_PACKAGE_TIERS = [
-  "Free",
-  "Growth",
-  "Scale",
-  "Enterprise",
-] as const;
-
-export type EmployerPackageTier = (typeof EMPLOYER_PACKAGE_TIERS)[number];
-
-export const EMPLOYER_INDUSTRIES = [
-  "Fintech",
-  "Healthtech",
-  "E-commerce",
-  "EdTech",
-  "Logistics",
-  "Gaming",
-] as const;
-export type EmployerIndustry = (typeof EMPLOYER_INDUSTRIES)[number];
-
-export const EMPLOYER_REGIONS = [
-  "North America",
-  "Europe",
-  "Africa",
-  "Asia",
-  "South America",
-] as const;
-export type EmployerRegion = (typeof EMPLOYER_REGIONS)[number];
+export type Paginated<T> = {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
 
 export type EmployerListItem = {
   id: string;
-  companyName: string;
-  verificationStatus: EmployerVerificationStatus;
-  packageTier: EmployerPackageTier;
-  hireCount: number;
-  offersSent: number;
-  rolesCreated: number;
-  signupDate: string;
-  lastActivityDate: string;
-  region: EmployerRegion;
-  industry: EmployerIndustry;
+  company_name: string;
+  is_verified: boolean;
+  package_tier: string;
+  hire_count: number;
+  offers_sent_count: number;
+  roles_created_count: number;
+  account_age_days: number;
+  last_activity_date: string;
 };
 
 export type EmployerRoleStatus = "Active" | "Closed";
@@ -54,53 +35,80 @@ export type OfferLifecycleStatus =
   | "Expired"
   | "Withdrawn";
 
-export type EmployerVerificationCriterion = {
-  label: string;
-  met: boolean;
-};
-
 export type EmployerRole = {
   id: string;
   title: string;
   status: EmployerRoleStatus;
-  createdAt: string;
 };
 
 export type EmployerOffer = {
   id: string;
-  candidateName: string;
-  roleTitle: string;
+  candidate_name: string;
+  role_title: string;
   status: OfferLifecycleStatus;
-  sentAt: string;
+  sent_at: string;
 };
 
 export type EmployerHire = {
   id: string;
-  candidateName: string;
-  roleTitle: string;
-  acceptedAt: string;
+  candidate_name: string;
+  role_title: string;
+  accepted_at: string;
 };
 
 export type EmployerDetail = {
-  id: string;
-  companyName: string;
-  website: string;
-  industry: EmployerIndustry;
-  size: string;
-  region: EmployerRegion;
-  linkedinUrl: string;
-
-  verificationStatus: EmployerVerificationStatus;
-  verificationCriteria: EmployerVerificationCriterion[];
-
-  packageTier: EmployerPackageTier;
-  subscriptionStatus: SubscriptionStatus | null;
-
-  rolesCreated: EmployerRole[];
-  offersSent: EmployerOffer[];
-
-  hireCount: number;
-  hireHistory: EmployerHire[];
-
-  signupDate: string;
+  company_profile: {
+    name: string;
+    website: string;
+    industry: string;
+    size: string;
+    region: string;
+    linkedin: string;
+  };
+  verification_status: {
+    verified: boolean;
+    criteria: {
+      email_verified: boolean;
+      website_resolvable: boolean;
+      linkedin_provided: boolean;
+    };
+    banner_visible: boolean;
+  };
+  package_and_subscription: {
+    package_tier: string;
+    subscription_status: string | null;
+  };
+  roles_created: {
+    items: EmployerRole[];
+    empty_message: string | null;
+  };
+  offers_sent: {
+    items: EmployerOffer[];
+    empty_message: string | null;
+  };
+  hire_history: {
+    hire_count: number;
+    items: EmployerHire[];
+  };
+  account_info: {
+    signup_date: string;
+    account_age_days: number;
+  };
 };
+
+export type GetEmployersResponse = ApiEnvelope<
+  Nested<Paginated<EmployerListItem>>
+>;
+
+export type GetEmployerDetailResponse = ApiEnvelope<Nested<EmployerDetail>>;
+
+export type EmployersQueryParams = {
+  page?: number;
+  limit?: number;
+  is_verified?: boolean;
+  region?: string;
+  industry?: string;
+  search?: string;
+};
+
+export type EmployersPage = Paginated<EmployerListItem>;
