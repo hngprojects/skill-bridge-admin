@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { StatusPill } from "@/components/shared/status-pill";
 import { useEmployerPackages } from "@/hooks/api/use-payments";
 
 export function EmployerPackagesSection() {
@@ -31,16 +30,14 @@ export function EmployerPackagesSection() {
               <TableHead>Package</TableHead>
               <TableHead>Monthly Price</TableHead>
               <TableHead>Offers / Month</TableHead>
-              <TableHead>Other Features</TableHead>
-              <TableHead className="text-right">Active Subscribers</TableHead>
-              <TableHead className="text-right">MRR</TableHead>
+              <TableHead>Features</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading
-              ? Array.from({ length: 3 }).map((_, i) => (
+              ? Array.from({ length: 2 }).map((_, i) => (
                   <TableRow key={i}>
-                    {Array.from({ length: 6 }).map((_, j) => (
+                    {Array.from({ length: 4 }).map((_, j) => (
                       <TableCell key={j}>
                         <Skeleton className="h-4 w-full rounded-md" />
                       </TableCell>
@@ -49,51 +46,24 @@ export function EmployerPackagesSection() {
                 ))
               : packages.map((pkg) => (
                   <TableRow key={pkg.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        <span>{pkg.name}</span>
-                        {pkg.isPending && (
-                          <StatusPill status="Pending" variant="warning" />
-                        )}
-                      </div>
+                    <TableCell className="font-medium">{pkg.name}</TableCell>
+                    <TableCell>
+                      {pkg.is_free ? "Free" : `$${pkg.price}/mo`}
                     </TableCell>
                     <TableCell>
-                      {pkg.monthlyPrice === "TBD" ? (
-                        <span className="text-muted-foreground">TBD</span>
-                      ) : pkg.monthlyPrice === 0 ? (
-                        "Free"
+                      {pkg.offer_limit === null ? (
+                        <span className="text-muted-foreground">Unlimited</span>
                       ) : (
-                        `$${pkg.monthlyPrice}/mo`
+                        pkg.offer_limit
                       )}
                     </TableCell>
                     <TableCell>
-                      {pkg.offersPerMonth === "TBD" ? (
-                        <span className="text-muted-foreground">TBD</span>
-                      ) : (
-                        pkg.offersPerMonth
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {pkg.otherFeatures.length === 0 ? (
+                      {!pkg.features?.length ? (
                         <span className="text-muted-foreground">—</span>
                       ) : (
                         <span className="text-xs text-muted-foreground">
-                          {pkg.otherFeatures.join(", ")}
+                          {pkg.features.join(", ")}
                         </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {pkg.isPending ? (
-                        <span className="text-muted-foreground">—</span>
-                      ) : (
-                        new Intl.NumberFormat().format(pkg.activeSubscribers)
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {pkg.mrr === "TBD" || pkg.mrr === 0 ? (
-                        <span className="text-muted-foreground">—</span>
-                      ) : (
-                        `$${new Intl.NumberFormat().format(pkg.mrr)}`
                       )}
                     </TableCell>
                   </TableRow>
@@ -101,11 +71,6 @@ export function EmployerPackagesSection() {
           </TableBody>
         </Table>
       </div>
-
-      <p className="text-xs text-muted-foreground">
-        Tier names, prices, and feature sets above Free are pending product
-        finalization (OQ-04). Structure is built ahead of the data.
-      </p>
     </div>
   );
 }
