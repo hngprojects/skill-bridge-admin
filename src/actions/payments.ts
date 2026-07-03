@@ -1,50 +1,79 @@
 "use server";
 
-import {
-  getMockRevenueData,
-  MOCK_EMPLOYER_PACKAGES,
-  MOCK_PAYMENTS_STATS,
-  MOCK_SUBSCRIPTIONS,
-  MOCK_TALENT_SUBSCRIPTION,
-  MOCK_TRANSACTIONS,
-} from "@/mocks/payments";
+import { authApi } from "@/lib/api/clients";
+import type { ApiEnvelope } from "@/types/api";
 import type {
   EmployerPackage,
   PaymentsStats,
   RevenueData,
   RevenuePeriod,
   Subscription,
+  TalentSubscriptionSummary,
   Transaction,
 } from "@/types/api/payments";
+import { unwrapData } from "./utils";
+
+type Nested<T> = { status: string; data: T };
 
 export async function getPaymentsStats(): Promise<PaymentsStats> {
-  await new Promise((r) => setTimeout(r, 300));
-  return MOCK_PAYMENTS_STATS;
+  const res = await authApi.get<ApiEnvelope<Nested<PaymentsStats>>>(
+    "/admin/payments/stats",
+  );
+  return unwrapData(res).data;
 }
 
 export async function getRevenueData(
   period: RevenuePeriod,
 ): Promise<RevenueData> {
-  await new Promise((r) => setTimeout(r, 300));
-  return getMockRevenueData(period);
+  const res = await authApi.get<ApiEnvelope<Nested<RevenueData>>>(
+    "/admin/payments/revenue-chart",
+    { params: { period } },
+  );
+  return unwrapData(res).data;
 }
 
 export async function getEmployerPackages(): Promise<EmployerPackage[]> {
-  await new Promise((r) => setTimeout(r, 300));
-  return MOCK_EMPLOYER_PACKAGES;
+  const res = await authApi.get<ApiEnvelope<Nested<EmployerPackage[]>>>(
+    "/admin/payments/employer-packages",
+  );
+  return unwrapData(res).data;
 }
 
-export async function getTalentSubscriptionSummary() {
-  await new Promise((r) => setTimeout(r, 300));
-  return MOCK_TALENT_SUBSCRIPTION;
+export async function getTalentSubscriptionSummary(): Promise<TalentSubscriptionSummary> {
+  const res = await authApi.get<ApiEnvelope<Nested<TalentSubscriptionSummary>>>(
+    "/admin/payments/talent-subscriptions",
+  );
+  return unwrapData(res).data;
 }
+
+type SubscriptionsPage = {
+  items: Subscription[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
 
 export async function getSubscriptions(): Promise<Subscription[]> {
-  await new Promise((r) => setTimeout(r, 400));
-  return MOCK_SUBSCRIPTIONS;
+  const res = await authApi.get<ApiEnvelope<Nested<SubscriptionsPage>>>(
+    "/admin/payments/subscriptions",
+    { params: { page: 1, limit: 20 } },
+  );
+  return unwrapData(res).data.items;
 }
 
+type TransactionsPage = {
+  items: Transaction[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
 export async function getTransactions(): Promise<Transaction[]> {
-  await new Promise((r) => setTimeout(r, 400));
-  return MOCK_TRANSACTIONS;
+  const res = await authApi.get<ApiEnvelope<Nested<TransactionsPage>>>(
+    "/admin/payments/transactions",
+    { params: { page: 1, limit: 20 } },
+  );
+  return unwrapData(res).data.items;
 }
