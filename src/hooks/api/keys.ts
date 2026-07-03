@@ -1,3 +1,5 @@
+import type { VoidedAttemptsQueryParams } from "@/types/api/integrity";
+
 export const healthKeys = {
   all: ["health"] as const,
   check: () => [...healthKeys.all, "check"] as const,
@@ -66,7 +68,8 @@ export const offersKeys = {
 export const integrityKeys = {
   all: ["integrity"] as const,
   stats: () => [...integrityKeys.all, "stats"] as const,
-  voidedAttempts: () => [...integrityKeys.all, "voided-attempts"] as const,
+  voidedAttempts: (params?: VoidedAttemptsQueryParams) =>
+    [...integrityKeys.all, "voided-attempts", params ?? {}] as const,
 };
 export const employersKeys = {
   all: ["employers"] as const,
