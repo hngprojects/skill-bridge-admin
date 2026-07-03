@@ -5,20 +5,29 @@ import {
   dehydrate,
 } from "@tanstack/react-query";
 
-import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
 import { employersQueryOptions } from "@/hooks/api/use-employers";
 import { EmployersTable } from "@/components/employers/employers-table";
+import { readEmployersParams } from "@/components/employers/search-params";
 
 export const metadata: Metadata = {
   title: "Employers",
 };
 
-export default async function EmployersPage() {
-  const queryClient = new QueryClient();
+type SearchParams = Record<string, string | string[] | undefined>;
 
-  await queryClient.prefetchQuery(
-    employersQueryOptions({ page: 1, limit: DEFAULT_PAGE_SIZE }),
-  );
+export default async function EmployersPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const resolved = await searchParams;
+  const params = readEmployersParams((key) => {
+    const value = resolved[key];
+    return Array.isArray(value) ? value[0] : value;
+  });
+
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery(employersQueryOptions(params));
 
   return (
     <div className="flex flex-col gap-6">
