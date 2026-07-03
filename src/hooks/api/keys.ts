@@ -57,10 +57,12 @@ export const paymentsKeys = {
 
 export const offersKeys = {
   all: ["offers"] as const,
-  stats: () => [...offersKeys.all, "stats"] as const,
-  funnel: () => [...offersKeys.all, "funnel"] as const,
+  stats: (params?: unknown) =>
+    [...offersKeys.all, "stats", params ?? {}] as const,
+  funnel: (params?: unknown) =>
+    [...offersKeys.all, "funnel", params ?? {}] as const,
   lists: () => [...offersKeys.all, "list"] as const,
-  list: () => [...offersKeys.lists()] as const,
+  list: (params?: unknown) => [...offersKeys.lists(), params ?? {}] as const,
 };
 
 export const integrityKeys = {

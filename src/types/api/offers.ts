@@ -6,26 +6,9 @@ export type OfferStatus =
   | "Failed"
   | "Accepted"
   | "Declined"
-  | "Expired";
-
-export type OffersStats = {
-  totalOffersSent: {
-    value: number;
-    trend: number;
-  };
-  offerAcceptanceRate: {
-    value: number;
-    trend: number;
-  };
-  offerToHireRate: {
-    value: number;
-    trend: number;
-  };
-  averageTimeToHire: {
-    value: string;
-    trend: number;
-  };
-};
+  | "Expired"
+  | "Hired"
+  | "Withdrawn";
 
 export type OfferFunnelSegmentStatus =
   | "pending"
@@ -35,7 +18,21 @@ export type OfferFunnelSegmentStatus =
   | "failed"
   | "accepted"
   | "declined"
-  | "expired";
+  | "expired"
+  | "hired"
+  | "withdrawn";
+
+export type OfferStatMetric = {
+  value: number | string;
+  trend?: number;
+};
+
+export type OffersStats = {
+  totalOffersSent: OfferStatMetric;
+  offerAcceptanceRate: OfferStatMetric;
+  offerToHireRate: OfferStatMetric;
+  averageTimeToHire: OfferStatMetric;
+};
 
 export type OfferFunnelSegment = {
   label: string;
@@ -47,11 +44,13 @@ export type OfferFunnelStage = {
   stage: string;
   count: number;
   dropOffPercent?: number;
-  segments?: OfferFunnelSegment[];
+  segments: OfferFunnelSegment[];
 };
 
 export type OfferFunnelData = {
   stages: OfferFunnelStage[];
+  total: number;
+  empty: boolean;
 };
 
 export type OfferListItem = {
@@ -64,6 +63,18 @@ export type OfferListItem = {
   dateResolved: string | null;
 };
 
+export type OffersDateRangeParams = {
+  dateFrom?: string;
+  dateTo?: string;
+};
+
+export type OffersListParams = OffersDateRangeParams & {
+  page?: number;
+  limit?: number;
+  status?: OfferStatus | "all";
+  search?: string;
+};
+
 export const OFFER_STATUSES: OfferStatus[] = [
   "Pending",
   "Assessment Unlocked",
@@ -73,4 +84,8 @@ export const OFFER_STATUSES: OfferStatus[] = [
   "Accepted",
   "Declined",
   "Expired",
+  "Hired",
+  "Withdrawn",
 ];
+
+export const OFFER_STATUS_OPTIONS = OFFER_STATUSES;
