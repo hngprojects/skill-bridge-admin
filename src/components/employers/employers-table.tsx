@@ -2,90 +2,104 @@
 
 import * as React from "react";
 
-import { DataTable } from "@/components/shared/data-table";
+import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
+import { useDebounce } from "@/hooks/use-debounce";
+import { ServerDataTable } from "@/components/shared/server-data-table";
 import { useEmployers } from "@/hooks/api/use-employers";
-import type { EmployerListItem } from "@/types/api/employers";
-import { getAccountAgeBucket } from "./account-age";
+import type {
+  EmployerListItem,
+  EmployersQueryParams,
+} from "@/types/api/employers";
 import { employerColumns } from "./columns";
 import { EmployerDetailPanel } from "./employer-detail-panel";
 import { EmployersFilters } from "./employers-filters";
 
 export function EmployersTable() {
-  const [verificationFilter, setVerificationFilter] = React.useState("");
-  const [tierFilter, setTierFilter] = React.useState("");
-  const [accountAgeFilter, setAccountAgeFilter] = React.useState("");
-  const [regionFilter, setRegionFilter] = React.useState("");
-  const [industryFilter, setIndustryFilter] = React.useState("");
+  const [page, setPage] = React.useState(1);
+  const [search, setSearch] = React.useState("");
+  const [verification, setVerification] = React.useState("");
+  const [region, setRegion] = React.useState("");
+  const [industry, setIndustry] = React.useState("");
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [panelOpen, setPanelOpen] = React.useState(false);
 
-  const { data: employers = [], isLoading } = useEmployers();
+  const debouncedSearch = useDebounce(search, 300);
+  const debouncedRegion = useDebounce(region, 300);
+  const debouncedIndustry = useDebounce(industry, 300);
 
-  const filtered = React.useMemo(() => {
-    return employers.filter((employer) => {
-      if (
-        verificationFilter &&
-        employer.verificationStatus !== verificationFilter
-      )
-        return false;
-      if (tierFilter && employer.packageTier !== tierFilter) return false;
-      if (
-        accountAgeFilter &&
-        getAccountAgeBucket(employer.signupDate) !== accountAgeFilter
-      )
-        return false;
-      if (regionFilter && employer.region !== regionFilter) return false;
-      if (industryFilter && employer.industry !== industryFilter) return false;
-      return true;
-    });
-  }, [
-    employers,
-    verificationFilter,
-    tierFilter,
-    accountAgeFilter,
-    regionFilter,
-    industryFilter,
-  ]);
+  const params = React.useMemo<EmployersQueryParams>(() => {
+    const next: EmployersQueryParams = { page, limit: DEFAULT_PAGE_SIZE };
+    if (debouncedSearch) next.search = debouncedSearch;
+    if (verification) next.is_verified = verification === "Verified";
+    if (debouncedRegion) next.region = debouncedRegion;
+    if (debouncedIndustry) next.industry = debouncedIndustry;
+    return next;
+  }, [page, debouncedSearch, verification, debouncedRegion, debouncedIndustry]);
+
+  const { data, isLoading } = useEmployers(params);
+  const employers = data?.items ?? [];
+  const totalPages = data?.totalPages ?? 0;
+  const total = data?.total ?? 0;
+
+  function handleSearchChange(value: string) {
+    setSearch(value);
+    setPage(1);
+  }
+
+  function handleVerificationChange(value: string) {
+    setVerification(value);
+    setPage(1);
+  }
+
+  function handleRegionChange(value: string) {
+    setRegion(value);
+    setPage(1);
+  }
+
+  function handleIndustryChange(value: string) {
+    setIndustry(value);
+    setPage(1);
+  }
+
+  function clearAllFilters() {
+    setSearch("");
+    setVerification("");
+    setRegion("");
+    setIndustry("");
+    setPage(1);
+  }
 
   function handleRowClick(employer: EmployerListItem) {
     setSelectedId(employer.id);
     setPanelOpen(true);
   }
 
-  function clearAllFilters() {
-    setVerificationFilter("");
-    setTierFilter("");
-    setAccountAgeFilter("");
-    setRegionFilter("");
-    setIndustryFilter("");
-  }
-
   return (
     <div className="flex flex-col gap-4">
       <EmployersFilters
-        verificationFilter={verificationFilter}
-        onVerificationChange={setVerificationFilter}
-        tierFilter={tierFilter}
-        onTierChange={setTierFilter}
-        accountAgeFilter={accountAgeFilter}
-        onAccountAgeChange={setAccountAgeFilter}
-        regionFilter={regionFilter}
-        onRegionChange={setRegionFilter}
-        industryFilter={industryFilter}
-        onIndustryChange={setIndustryFilter}
+        search={search}
+        onSearchChange={handleSearchChange}
+        verification={verification}
+        onVerificationChange={handleVerificationChange}
+        region={region}
+        onRegionChange={handleRegionChange}
+        industry={industry}
+        onIndustryChange={handleIndustryChange}
         onClearAll={clearAllFilters}
-        employerCount={filtered.length}
+        total={total}
         isLoading={isLoading}
       />
 
-      <DataTable
+      <ServerDataTable
         columns={employerColumns}
-        data={filtered}
+        data={employers}
+        pageIndex={page - 1}
+        pageCount={totalPages}
+        onPageChange={(pageIndex) => setPage(pageIndex + 1)}
         isLoading={isLoading}
         emptyTitle="No employers found"
         emptyMessage="No employers match your current filters."
         onRowClick={handleRowClick}
-        searchPlaceholder="Search by company name…"
       />
 
       <EmployerDetailPanel

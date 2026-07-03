@@ -1,12 +1,25 @@
 import type { Metadata } from "next";
+import {
+  HydrationBoundary,
+  QueryClient,
+  dehydrate,
+} from "@tanstack/react-query";
 
+import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
+import { employersQueryOptions } from "@/hooks/api/use-employers";
 import { EmployersTable } from "@/components/employers/employers-table";
 
 export const metadata: Metadata = {
   title: "Employers",
 };
 
-export default function EmployersPage() {
+export default async function EmployersPage() {
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery(
+    employersQueryOptions({ page: 1, limit: DEFAULT_PAGE_SIZE }),
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -17,7 +30,9 @@ export default function EmployersPage() {
         </p>
       </div>
 
-      <EmployersTable />
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <EmployersTable />
+      </HydrationBoundary>
     </div>
   );
 }
