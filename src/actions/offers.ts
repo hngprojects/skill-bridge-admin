@@ -12,6 +12,7 @@ import type {
   OffersListParams,
   OffersStats,
   OfferStatus,
+  OfferStatMetric,
 } from "@/types/api/offers";
 
 type Nested<T> = { status: string; data: T };
@@ -86,9 +87,9 @@ function trendToValue(trend?: ApiTrend): number | undefined {
 }
 
 function buildStatMetric(
-  value: number | string,
+  value: OfferStatMetric["value"],
   trend?: ApiTrend,
-): OffersStats["totalOffersSent"] {
+): OfferStatMetric {
   const trendValue = trendToValue(trend);
 
   if (trendValue === undefined) {
