@@ -1,60 +1,68 @@
-export type SubscriberType = "Employer" | "Talent";
+export type SubscriberType = "employer" | "talent";
 
-export type SubscriptionStatus = "Active" | "Past Due" | "Cancelled" | "Free";
+export type SubscriptionStatus = "active" | "past_due" | "cancelled" | "free";
 
-export type TransactionStatus = "Successful" | "Failed" | "Refunded";
+export type TransactionStatus = "successful" | "failed" | "refunded";
 
 export type PaymentsStats = {
-  totalRevenue: { value: number; trend: number };
-  activeEmployerSubscriptions: { value: number; trend: number };
-  activeTalentSubscriptions: { value: number; trend: number };
-  failedPayments: { value: number; trend: number };
+  total_revenue: { value: number; currency: string };
+  active_employer_subscriptions: number;
+  active_talent_subscriptions: number;
+  failed_payment_count: number;
 };
 
 export type RevenuePeriod = "yearly" | "monthly" | "weekly" | "daily";
 
-export type RevenueDataPoint = {
-  label: string;
-  employerRevenue: number;
-  talentRevenue: number;
-};
+export type RevenueEntry = { period: string; amount: number };
 
 export type RevenueData = {
-  period: RevenuePeriod;
-  data: RevenueDataPoint[];
+  employer_revenue: RevenueEntry[];
+  talent_revenue: RevenueEntry[];
 };
 
 export type EmployerPackage = {
   id: string;
   name: string;
+  price: number;
+  offer_limit: number | null;
+  features: string[] | null;
+  is_free: boolean;
+};
 
-  monthlyPrice: number | "TBD";
-  offersPerMonth: number | "Unlimited" | "TBD";
-  otherFeatures: string[];
-  activeSubscribers: number;
-  mrr: number | "TBD";
-
-  isPending?: boolean;
+export type TalentSubscriptionSummary = {
+  total_active: number;
+  total_cancelled: number;
+  monthly_price: number | null;
 };
 
 export type Subscription = {
   id: string;
-  subscriberName: string;
-  subscriberType: SubscriberType;
-  packageName: string;
-  monthlyPrice: number | null;
+  subscriber_name: string;
+  type: SubscriberType;
+  package_tier: string;
+  monthly_price: number | null;
   status: SubscriptionStatus;
-  startDate: string;
-  nextBillingDate: string | null;
-  gracePeriodDaysLeft?: number;
+  start_date: string;
+  next_billing_date: string | null;
+  days_left_in_grace: number | null;
 };
 
 export type Transaction = {
   id: string;
-  subscriberName: string;
-  subscriberType: SubscriberType;
+  subscriber_name: string;
+  type: SubscriberType;
   amount: number;
+  currency: string;
   date: string;
   status: TransactionStatus;
-  linkedSubscription: string;
+  linked_subscription_id: string;
+};
+
+export type AccountSettings = {
+  id: string;
+  name: string;
+  email: string;
+  role: "super_admin" | "admin" | "reviewer";
+  admin_tier: string;
+  role_badge: string;
 };
