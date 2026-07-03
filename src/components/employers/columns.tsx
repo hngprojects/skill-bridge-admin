@@ -1,8 +1,8 @@
-import { format } from "date-fns";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { StatusPill } from "@/components/shared/status-pill";
 import type { EmployerListItem } from "@/types/api/employers";
+import { formatDate } from "@/lib/format-date";
 import { formatAccountAgeDays } from "./account-age";
 
 export const employerColumns: ColumnDef<EmployerListItem>[] = [
@@ -44,7 +44,6 @@ export const employerColumns: ColumnDef<EmployerListItem>[] = [
   {
     accessorKey: "last_activity_date",
     header: "Last Activity",
-    cell: ({ row }) =>
-      format(new Date(row.original.last_activity_date), "MMM d, yyyy"),
+    cell: ({ row }) => formatDate(row.original.last_activity_date),
   },
 ];

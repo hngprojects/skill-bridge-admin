@@ -1,8 +1,7 @@
-import { format } from "date-fns";
-
 import { StatusPill } from "@/components/shared/status-pill";
 import type { EmployerDetail } from "@/types/api/employers";
 import type { SubscriptionStatus } from "@/types/api/talents";
+import { formatDate } from "@/lib/format-date";
 import { formatAccountAgeDays } from "./account-age";
 import { Field, Section, subscriptionVariantMap } from "./detail-helpers";
 
@@ -109,7 +108,7 @@ export function EmployerProfileTab({ data }: { data: EmployerDetail }) {
             {formatAccountAgeDays(data.account_info.account_age_days)}
           </Field>
           <Field label="Signup Date">
-            {format(new Date(data.account_info.signup_date), "MMM d, yyyy")}
+            {formatDate(data.account_info.signup_date)}
           </Field>
         </div>
       </Section>

@@ -1,7 +1,6 @@
-import { format } from "date-fns";
-
 import { StatusPill } from "@/components/shared/status-pill";
 import type { EmployerDetail } from "@/types/api/employers";
+import { formatDate } from "@/lib/format-date";
 import {
   Field,
   offerStatusVariantMap,
@@ -85,7 +84,7 @@ export function EmployerActivityTab({ data }: { data: EmployerDetail }) {
                   </span>
                 </div>
                 <span className="text-xs text-muted-foreground">
-                  {format(new Date(hire.accepted_at), "MMM d, yyyy")}
+                  {formatDate(hire.accepted_at)}
                 </span>
               </div>
             ))}
