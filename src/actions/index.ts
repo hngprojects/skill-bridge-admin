@@ -8,3 +8,4 @@ export * from "./utils";
 export * from "./offers";
 export * from "./engagement";
 export * from "./admin-management";
+export * from "./account";

@@ -6,16 +6,17 @@ import { signOut } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ADMIN_ROLE_LABELS } from "@/constants/admin-roles";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/constants/admin-routes";
 import type { AdminRole } from "@/types/api/auth";
 import { StatusPill } from "@/components/shared/status-pill";
 import type { StatusPillVariant } from "@/components/shared/status-pill";
+import { useAccountSettings } from "@/hooks/api/use-account";
 
 type AccountSettingsShellProps = {
-  name: string | null | undefined;
-  email: string | null | undefined;
-  role: AdminRole;
+  sessionName: string | null | undefined;
+  sessionEmail: string | null | undefined;
+  sessionRole: AdminRole;
 };
 
 function roleVariant(role: AdminRole): StatusPillVariant {
@@ -24,12 +25,13 @@ function roleVariant(role: AdminRole): StatusPillVariant {
   return "muted";
 }
 
-type FieldRowProps = {
+function FieldRow({
+  label,
+  children,
+}: {
   label: string;
   children: React.ReactNode;
-};
-
-function FieldRow({ label, children }: FieldRowProps) {
+}) {
   return (
     <div className="flex flex-col gap-1">
       <p className="text-xs text-muted-foreground">{label}</p>
@@ -39,10 +41,20 @@ function FieldRow({ label, children }: FieldRowProps) {
 }
 
 export function AccountSettingsShell({
-  name,
-  email,
-  role,
+  sessionName,
+  sessionEmail,
+  sessionRole,
 }: AccountSettingsShellProps) {
+  const { data: account, isLoading } = useAccountSettings();
+
+  const name = account?.name ?? sessionName;
+  const email = account?.email ?? sessionEmail;
+  const role = (account?.role ?? sessionRole) as AdminRole;
+
+  const roleBadge =
+    account?.role_badge ??
+    role.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
   return (
     <div className="flex max-w-md flex-col gap-6">
       <Card>
@@ -51,16 +63,29 @@ export function AccountSettingsShell({
             Profile
           </p>
 
-          <FieldRow label="Name">{name ?? "—"}</FieldRow>
+          <FieldRow label="Name">
+            {isLoading && !name ? (
+              <Skeleton className="h-4 w-40 rounded-md" />
+            ) : (
+              (name ?? "—")
+            )}
+          </FieldRow>
 
-          <FieldRow label="Email">{email ?? "—"}</FieldRow>
+          <FieldRow label="Email">
+            {isLoading && !email ? (
+              <Skeleton className="h-4 w-52 rounded-md" />
+            ) : (
+              (email ?? "—")
+            )}
+          </FieldRow>
 
           <div className="flex flex-col gap-1">
             <p className="text-xs text-muted-foreground">Role</p>
-            <StatusPill
-              status={ADMIN_ROLE_LABELS[role]}
-              variant={roleVariant(role)}
-            />
+            {isLoading && !account ? (
+              <Skeleton className="h-6 w-24 rounded-full" />
+            ) : (
+              <StatusPill status={roleBadge} variant={roleVariant(role)} />
+            )}
           </div>
 
           <p className="text-xs text-muted-foreground">
