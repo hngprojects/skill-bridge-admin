@@ -66,3 +66,17 @@ export type AccountSettings = {
   admin_tier: string;
   role_badge: string;
 };
+
+export type Nested<T> = { status: string; data: T };
+
+export type PaginatedResult<T> = {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+};
+
+export type SubscriptionsPage = PaginatedResult<Subscription>;
+
+export type TransactionsPage = PaginatedResult<Transaction>;

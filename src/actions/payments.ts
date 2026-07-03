@@ -4,16 +4,17 @@ import { authApi } from "@/lib/api/clients";
 import type { ApiEnvelope } from "@/types/api";
 import type {
   EmployerPackage,
+  Nested,
   PaymentsStats,
   RevenueData,
   RevenuePeriod,
   Subscription,
+  SubscriptionsPage,
   TalentSubscriptionSummary,
   Transaction,
+  TransactionsPage,
 } from "@/types/api/payments";
 import { unwrapData } from "./utils";
-
-type Nested<T> = { status: string; data: T };
 
 export async function getPaymentsStats(): Promise<PaymentsStats> {
   const res = await authApi.get<ApiEnvelope<Nested<PaymentsStats>>>(
@@ -46,14 +47,6 @@ export async function getTalentSubscriptionSummary(): Promise<TalentSubscription
   return unwrapData(res).data;
 }
 
-type SubscriptionsPage = {
-  items: Subscription[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-};
-
 export async function getSubscriptions(): Promise<Subscription[]> {
   const res = await authApi.get<ApiEnvelope<Nested<SubscriptionsPage>>>(
     "/admin/payments/subscriptions",
@@ -61,14 +54,6 @@ export async function getSubscriptions(): Promise<Subscription[]> {
   );
   return unwrapData(res).data.items;
 }
-
-type TransactionsPage = {
-  items: Transaction[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-};
 
 export async function getTransactions(): Promise<Transaction[]> {
   const res = await authApi.get<ApiEnvelope<Nested<TransactionsPage>>>(
