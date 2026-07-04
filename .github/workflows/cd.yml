@@ -30,15 +30,15 @@ jobs:
           if [ "${{ github.ref_name }}" = "dev" ]; then
             echo "dir=dev" >> "$GITHUB_OUTPUT"
             echo "app=skillbridge-admin-dev" >> "$GITHUB_OUTPUT"
-            echo "port=3001" >> "$GITHUB_OUTPUT"
+            echo "port=3002" >> "$GITHUB_OUTPUT"
           elif [ "${{ github.ref_name }}" = "staging" ]; then
             echo "dir=staging" >> "$GITHUB_OUTPUT"
             echo "app=skillbridge-admin-staging" >> "$GITHUB_OUTPUT"
-            echo "port=4001" >> "$GITHUB_OUTPUT"
+            echo "port=4002" >> "$GITHUB_OUTPUT"
           elif [ "${{ github.ref_name }}" = "main" ]; then
             echo "dir=production" >> "$GITHUB_OUTPUT"
             echo "app=skillbridge-admin-prod" >> "$GITHUB_OUTPUT"
-            echo "port=5001" >> "$GITHUB_OUTPUT"
+            echo "port=5002" >> "$GITHUB_OUTPUT"
           else
             echo "::error::Unknown branch '${{ github.ref_name }}' — expected 'dev', 'staging', or 'main'"
             exit 1
