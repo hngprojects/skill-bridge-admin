@@ -1,12 +1,9 @@
 "use client";
 
-import * as React from "react";
 import {
   getCoreRowModel,
-  getSortedRowModel,
   useReactTable,
   type ColumnDef,
-  type SortingState,
 } from "@tanstack/react-table";
 
 import { cn } from "@/lib/utils";
@@ -45,21 +42,16 @@ export function ServerDataTable<TData>({
 }: ServerDataTableProps<TData>) {
   "use no memo";
 
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
     filterFns: { exact: () => true },
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     manualPagination: true,
     pageCount,
-    onSortingChange: setSorting,
     state: {
       pagination: { pageIndex, pageSize },
-      sorting,
     },
     onPaginationChange: (updater) => {
       const next =

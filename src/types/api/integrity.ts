@@ -24,7 +24,7 @@ export type VoidedAttempt = {
   tab_switch_count: number;
   copy_paste_count: number;
   violation_count: number;
-  highest_confidence: string | null;
+  highest_confidence: "high" | "medium" | "low" | null;
   started_at: string;
   completed_at: string;
 };

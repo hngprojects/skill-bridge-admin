@@ -77,7 +77,10 @@ export const voidedAttemptColumns: ColumnDef<VoidedAttempt>[] = [
   {
     accessorKey: "completed_at",
     header: "Session Date",
-    cell: ({ row }) =>
-      format(new Date(row.original.completed_at), "MMM d, yyyy"),
+    cell: ({ row }) => {
+      const date = row.original.completed_at;
+      if (!date) return <span className="text-muted-foreground">—</span>;
+      return format(new Date(date), "MMM d, yyyy");
+    },
   },
 ];

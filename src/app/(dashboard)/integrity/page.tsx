@@ -30,7 +30,9 @@ export default async function IntegrityPage({
     return Array.isArray(value) ? value[0] : value;
   });
 
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { staleTime: 30_000 } },
+  });
   await Promise.all([
     queryClient.prefetchQuery(integrityStatsQueryOptions()),
     queryClient.prefetchQuery(voidedAttemptsQueryOptions(params)),
