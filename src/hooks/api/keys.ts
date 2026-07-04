@@ -1,3 +1,5 @@
+import type { VoidedAttemptsQueryParams } from "@/types/api/integrity";
+
 import type { EmployersQueryParams } from "@/types/api/employers";
 import type { TalentsQueryParams } from "@/types/api/talents";
 import type { QuestionsQueryParams } from "@/types/api/question-bank";
@@ -68,16 +70,19 @@ export const paymentsKeys = {
 
 export const offersKeys = {
   all: ["offers"] as const,
-  stats: () => [...offersKeys.all, "stats"] as const,
-  funnel: () => [...offersKeys.all, "funnel"] as const,
+  stats: (params?: unknown) =>
+    [...offersKeys.all, "stats", params ?? {}] as const,
+  funnel: (params?: unknown) =>
+    [...offersKeys.all, "funnel", params ?? {}] as const,
   lists: () => [...offersKeys.all, "list"] as const,
-  list: () => [...offersKeys.lists()] as const,
+  list: (params?: unknown) => [...offersKeys.lists(), params ?? {}] as const,
 };
 
 export const integrityKeys = {
   all: ["integrity"] as const,
   stats: () => [...integrityKeys.all, "stats"] as const,
-  voidedAttempts: () => [...integrityKeys.all, "voided-attempts"] as const,
+  voidedAttempts: (params?: VoidedAttemptsQueryParams) =>
+    [...integrityKeys.all, "voided-attempts", params ?? {}] as const,
 };
 export const employersKeys = {
   all: ["employers"] as const,

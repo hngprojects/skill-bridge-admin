@@ -14,6 +14,8 @@ export const offerStatusVariantMap: Record<OfferStatus, StatusPillVariant> = {
   Accepted: "success",
   Declined: "error",
   Expired: "warning",
+  Hired: "success",
+  Withdrawn: "muted",
 };
 
 export const offerColumns: ColumnDef<OfferListItem>[] = [
