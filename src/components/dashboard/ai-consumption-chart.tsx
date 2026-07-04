@@ -57,10 +57,10 @@ export function AIConsumptionChart() {
           <Skeleton className="h-52 w-full rounded-xl" />
         ) : (
           <ChartContainer config={chartConfig} className="h-52 w-full">
-            <BarChart data={data?.data ?? []} barSize={28}>
+            <BarChart data={data?.buckets ?? []} barSize={28}>
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey="label"
+                dataKey="range"
                 tickLine={false}
                 axisLine={false}
                 tick={{ fontSize: 11 }}

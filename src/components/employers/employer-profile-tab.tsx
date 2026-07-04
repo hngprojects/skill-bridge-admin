@@ -1,37 +1,48 @@
-import { format } from "date-fns";
-
 import { StatusPill } from "@/components/shared/status-pill";
 import type { EmployerDetail } from "@/types/api/employers";
-import { formatAccountAge } from "./account-age";
-import {
-  Field,
-  Section,
-  subscriptionVariantMap,
-  verificationVariantMap,
-} from "./detail-helpers";
+import type { SubscriptionStatus } from "@/types/api/talents";
+import { formatDate } from "@/lib/format-date";
+import { formatAccountAgeDays } from "./account-age";
+import { Field, Section, subscriptionVariantMap } from "./detail-helpers";
 
 export function EmployerProfileTab({ data }: { data: EmployerDetail }) {
+  const profile = data.company_profile;
+  const verification = data.verification_status;
+  const subscription = data.package_and_subscription.subscription_status;
+
+  const criteria = [
+    { label: "Email verified", met: verification.criteria.email_verified },
+    {
+      label: "Website resolvable",
+      met: verification.criteria.website_resolvable,
+    },
+    {
+      label: "LinkedIn provided",
+      met: verification.criteria.linkedin_provided,
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-6 px-6 py-5">
       <Section title="Company Profile">
         <div className="flex flex-col gap-3">
           <Field label="Website">
             <a
-              href={data.website}
+              href={profile.website}
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary-700 hover:underline"
             >
-              {data.website.replace(/^https?:\/\//, "")}
+              {profile.website.replace(/^https?:\/\//, "")}
             </a>
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Industry">{data.industry}</Field>
-            <Field label="Company Size">{data.size}</Field>
-            <Field label="Region">{data.region}</Field>
+            <Field label="Industry">{profile.industry}</Field>
+            <Field label="Company Size">{profile.size}</Field>
+            <Field label="Region">{profile.region}</Field>
             <Field label="LinkedIn">
               <a
-                href={data.linkedinUrl}
+                href={profile.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary-700 hover:underline"
@@ -46,13 +57,14 @@ export function EmployerProfileTab({ data }: { data: EmployerDetail }) {
       <Section title="Verification Status">
         <div className="flex items-center justify-between gap-2">
           <span className="text-sm">Overall</span>
-          <StatusPill
-            status={data.verificationStatus}
-            variant={verificationVariantMap[data.verificationStatus]}
-          />
+          {verification.verified ? (
+            <StatusPill status="Verified" variant="success" />
+          ) : (
+            <StatusPill status="Unverified" variant="error" />
+          )}
         </div>
         <div className="flex flex-col gap-2">
-          {data.verificationCriteria.map((criterion) => (
+          {criteria.map((criterion) => (
             <div
               key={criterion.label}
               className="flex items-center justify-between gap-2"
@@ -71,12 +83,17 @@ export function EmployerProfileTab({ data }: { data: EmployerDetail }) {
 
       <Section title="Package & Subscription">
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Package Tier">{data.packageTier}</Field>
+          <Field label="Package Tier">
+            {data.package_and_subscription.package_tier}
+          </Field>
           <Field label="Subscription">
-            {data.subscriptionStatus ? (
+            {subscription && subscription !== "Free" ? (
               <StatusPill
-                status={data.subscriptionStatus}
-                variant={subscriptionVariantMap[data.subscriptionStatus]}
+                status={subscription}
+                variant={
+                  subscriptionVariantMap[subscription as SubscriptionStatus] ??
+                  "default"
+                }
               />
             ) : (
               <StatusPill status="Free" variant="muted" />
@@ -87,9 +104,11 @@ export function EmployerProfileTab({ data }: { data: EmployerDetail }) {
 
       <Section title="Account Info">
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Account Age">{formatAccountAge(data.signupDate)}</Field>
+          <Field label="Account Age">
+            {formatAccountAgeDays(data.account_info.account_age_days)}
+          </Field>
           <Field label="Signup Date">
-            {format(new Date(data.signupDate), "MMM d, yyyy")}
+            {formatDate(data.account_info.signup_date)}
           </Field>
         </div>
       </Section>

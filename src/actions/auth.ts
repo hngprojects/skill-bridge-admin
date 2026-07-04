@@ -1,97 +1,60 @@
 "use server";
 
-import { LOGIN_ERROR_MESSAGES } from "@/constants/auth";
+import type { ApiEnvelope } from "@/types/api";
 import type {
-  AdminAuthUser,
-  AdminRole,
-  LoginErrorCode,
   LoginInput,
   LoginResponseData,
-  LoginResult,
+  RefreshResponseData,
 } from "@/types/api/auth";
+import { publicApi } from "@/lib/api/clients";
+import {
+  getServerCookieHeader,
+  parseSetCookieHeader,
+  persistServerCookies,
+  setCookieHeadersFrom,
+} from "@/lib/api/cookies";
+import { unwrapData } from "./utils";
 
-type MockAccount = {
-  password: string;
-  user: AdminAuthUser;
-  deactivated?: boolean;
-};
+export async function login(body: LoginInput): Promise<LoginResponseData> {
+  const res = await publicApi.post<ApiEnvelope<LoginResponseData>>(
+    "/admin/auth/login",
+    body,
+  );
 
-const MOCK_ACCOUNTS: Record<string, MockAccount> = {
-  "super@skillbridge.test": {
-    password: "password",
-    user: {
-      id: "mock-super-admin",
-      email: "super@skillbridge.test",
-      fullname: "Super Admin",
-      role: "super_admin",
-    },
-  },
-  "admin@skillbridge.test": {
-    password: "password",
-    user: {
-      id: "mock-admin",
-      email: "admin@skillbridge.test",
-      fullname: "Platform Admin",
-      role: "admin",
-    },
-  },
-  "reviewer@skillbridge.test": {
-    password: "password",
-    user: {
-      id: "mock-reviewer",
-      email: "reviewer@skillbridge.test",
-      fullname: "Question Reviewer",
-      role: "reviewer",
-    },
-  },
-  "deactivated@skillbridge.test": {
-    password: "password",
-    deactivated: true,
-    user: {
-      id: "mock-deactivated",
-      email: "deactivated@skillbridge.test",
-      fullname: "Deactivated Admin",
-      role: "admin",
-    },
-  },
-};
+  // Forward API auth cookies to the browser so subsequent server-action API
+  // calls can read and proxy them via getServerCookieHeader().
+  const cookies = setCookieHeadersFrom(res.headers)
+    .map(parseSetCookieHeader)
+    .filter((c): c is NonNullable<typeof c> => c != null);
 
-function mockTokens(role: AdminRole): LoginResponseData["tokens"] {
-  return {
-    access_token: `mock-access-token-${role}`,
-    refresh_token: `mock-refresh-token-${role}`,
-  };
+  if (cookies.length === 0) {
+    throw new Error(
+      "Authentication failed: no session cookies returned by the API.",
+    );
+  }
+
+  await persistServerCookies(cookies);
+
+  return unwrapData(res);
 }
 
-function fail(code: LoginErrorCode): LoginResult {
-  return { ok: false, code, message: LOGIN_ERROR_MESSAGES[code] };
-}
+export async function refreshTokens(): Promise<RefreshResponseData> {
+  const cookieHeader = await getServerCookieHeader();
+  const res = await publicApi.post<ApiEnvelope<RefreshResponseData>>(
+    "/auth/refresh",
+    undefined,
+    cookieHeader ? { headers: { Cookie: cookieHeader } } : undefined,
+  );
 
-export async function login(input: LoginInput): Promise<LoginResult> {
-  const email = input.email.trim().toLowerCase();
-  const account = MOCK_ACCOUNTS[email];
+  // Persist any rotated cookies (new access/refresh tokens) back to the browser.
+  const cookies = setCookieHeadersFrom(res.headers)
+    .map(parseSetCookieHeader)
+    .filter((c): c is NonNullable<typeof c> => c != null);
+  await persistServerCookies(cookies);
 
-  if (!account) {
-    return fail("NO_ACCOUNT");
-  }
-
-  if (account.deactivated) {
-    return fail("ACCOUNT_DEACTIVATED");
-  }
-
-  if (account.password !== input.password) {
-    return fail("INVALID_CREDENTIALS");
-  }
-
-  return {
-    ok: true,
-    data: {
-      user: account.user,
-      tokens: mockTokens(account.user.role),
-    },
-  };
+  return unwrapData(res);
 }
 
 export async function logout(): Promise<void> {
-  // Mock: real API will call POST /auth/logout
+  // TODO: POST /admin/auth/logout when endpoint is available
 }

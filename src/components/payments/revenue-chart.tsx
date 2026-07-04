@@ -14,30 +14,64 @@ import {
   ChartLegendContent,
   type ChartConfig,
 } from "@/components/ui/chart";
+import { REVENUE_PERIODS } from "@/constants/payments";
 import { useRevenueData } from "@/hooks/api/use-payments";
 import type { RevenuePeriod } from "@/types/api/payments";
 
-const PERIODS: { label: string; value: RevenuePeriod }[] = [
-  { label: "Yearly", value: "yearly" },
-  { label: "Monthly", value: "monthly" },
-  { label: "Weekly", value: "weekly" },
-  { label: "Daily", value: "daily" },
-];
-
 const chartConfig = {
-  employerRevenue: {
+  employer_revenue: {
     label: "Employer Packages",
     color: "#663f85",
   },
-  talentRevenue: {
+  talent_revenue: {
     label: "Talent Subscriptions",
     color: "#a78bfa",
   },
 } satisfies ChartConfig;
 
+function mergeRevenueData(
+  employer: { period: string; amount: number }[],
+  talent: { period: string; amount: number }[],
+) {
+  const map = new Map<
+    string,
+    { label: string; employer_revenue: number; talent_revenue: number }
+  >();
+
+  employer.forEach(({ period, amount }) => {
+    const label = new Date(period).toLocaleDateString("en-GB", {
+      month: "short",
+      year: "2-digit",
+    });
+    map.set(period, { label, employer_revenue: amount, talent_revenue: 0 });
+  });
+
+  talent.forEach(({ period, amount }) => {
+    if (map.has(period)) {
+      map.get(period)!.talent_revenue = amount;
+    } else {
+      const label = new Date(period).toLocaleDateString("en-GB", {
+        month: "short",
+        year: "2-digit",
+      });
+      map.set(period, { label, employer_revenue: 0, talent_revenue: amount });
+    }
+  });
+
+  return Array.from(map.values());
+}
+
 export function RevenueChart() {
   const [period, setPeriod] = React.useState<RevenuePeriod>("monthly");
   const { data, isLoading } = useRevenueData(period);
+
+  const chartData = React.useMemo(() => {
+    if (!data) return [];
+    return mergeRevenueData(
+      data.employer_revenue ?? [],
+      data.talent_revenue ?? [],
+    );
+  }, [data]);
 
   return (
     <Card>
@@ -49,7 +83,7 @@ export function RevenueChart() {
             onValueChange={(v) => setPeriod(v as RevenuePeriod)}
           >
             <TabsList>
-              {PERIODS.map((p) => (
+              {REVENUE_PERIODS.map((p) => (
                 <TabsTrigger key={p.value} value={p.value}>
                   {p.label}
                 </TabsTrigger>
@@ -61,13 +95,13 @@ export function RevenueChart() {
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-52 w-full rounded-xl" />
-        ) : (data?.data ?? []).length === 0 ? (
+        ) : chartData.length === 0 ? (
           <div className="flex h-52 items-center justify-center text-sm text-muted-foreground">
             Not enough revenue data yet.
           </div>
         ) : (
           <ChartContainer config={chartConfig} className="h-52 w-full">
-            <BarChart data={data?.data ?? []} barSize={22}>
+            <BarChart data={chartData} barSize={22}>
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="label"
@@ -92,15 +126,15 @@ export function RevenueChart() {
               />
               <ChartLegend content={<ChartLegendContent />} />
               <Bar
-                dataKey="employerRevenue"
+                dataKey="employer_revenue"
                 stackId="a"
-                fill="var(--color-employerRevenue)"
+                fill="var(--color-employer_revenue)"
                 radius={[0, 0, 0, 0]}
               />
               <Bar
-                dataKey="talentRevenue"
+                dataKey="talent_revenue"
                 stackId="a"
-                fill="var(--color-talentRevenue)"
+                fill="var(--color-talent_revenue)"
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>

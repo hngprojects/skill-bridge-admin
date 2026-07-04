@@ -2,6 +2,7 @@ import axios, { type AxiosInstance } from "axios";
 
 import type { RetriableRequestConfig } from "@/types/api/client";
 
+import { getServerCookieHeader } from "./cookies";
 import { isAuthRefreshRequest, refreshAuthCookies } from "./refresh";
 import { getAuthToken } from "./token";
 
@@ -15,6 +16,16 @@ export function attachAuthRequestInterceptor(instance: AxiosInstance) {
     if (token) {
       config.headers.set("Authorization", `Bearer ${token}`);
     }
+
+    // Server-side: withCredentials is browser-only. Forward the incoming
+    // request's cookies manually so the API receives the auth/refresh tokens.
+    if (typeof window === "undefined" && !config.headers.get("Cookie")) {
+      const cookieHeader = await getServerCookieHeader();
+      if (cookieHeader) {
+        config.headers.set("Cookie", cookieHeader);
+      }
+    }
+
     return config;
   });
 }

@@ -38,25 +38,29 @@ export function AdminLoginForm() {
   async function onSubmit(values: AdminLoginFormValues) {
     setFormError(null);
 
-    const result = await login({
-      email: values.email,
-      password: values.password,
-    });
-
-    if (!result.ok) {
-      setFormError(result.message);
+    let user: Awaited<ReturnType<typeof login>>["user"];
+    try {
+      const data = await login({
+        email: values.email,
+        password: values.password,
+      });
+      user = data.user;
+    } catch (err) {
+      setFormError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
       return;
     }
-
-    const { user, tokens } = result.data;
 
     const signInResult = await signIn("credentials", {
       sessionUser: "true",
       userId: user.id,
       email: user.email,
       name: user.fullname,
-      role: user.role,
-      accessToken: tokens.access_token,
+      image: user.avatar_url ?? undefined,
+      role: user.admin_tier ?? user.role,
       redirect: false,
     });
 

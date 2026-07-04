@@ -23,15 +23,15 @@ export function CandidateDetailPanel({
   const { data, isLoading } = useCandidateDetail(talentId);
 
   const isGated =
-    !!data?.stage3?.retakeGateExpiresAt &&
-    isFuture(new Date(data.stage3.retakeGateExpiresAt));
+    !!data?.stage3_result?.retake_gate?.locked_until &&
+    isFuture(new Date(data.stage3_result.retake_gate.locked_until));
 
   return (
     <SlideOverPanel
       open={open}
       onOpenChange={onOpenChange}
-      title={data?.name ?? "Candidate Detail"}
-      description={data?.email}
+      title={data?.profile_basics?.name ?? "Candidate Detail"}
+      description={data?.profile_basics?.email}
       isLoading={isLoading || (talentId !== null && !data)}
     >
       <Tabs defaultValue="profile">
