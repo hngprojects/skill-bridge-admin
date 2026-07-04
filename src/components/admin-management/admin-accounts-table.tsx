@@ -65,7 +65,8 @@ export function AdminAccountsTable() {
   const [emailError, setEmailError] = React.useState("");
 
   const queryClient = useQueryClient();
-  const { data: admins = [], isLoading } = useAdminAccounts();
+  const { data, isLoading } = useAdminAccounts();
+  const admins = data?.items ?? [];
 
   async function handleResult(result: { ok: boolean; message: string }) {
     if (!result.ok) {
@@ -189,6 +190,7 @@ export function AdminAccountsTable() {
     changeRoleMutation.mutate({
       id: selectedAdmin.id,
       role: selectedRole,
+      confirm_downgrade: isDowngradingSuperAdmin,
     });
   }
 

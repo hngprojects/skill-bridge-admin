@@ -1,3 +1,4 @@
+import type { AdminAccountsQueryParams } from "@/types/api/admin-management";
 import type { VoidedAttemptsQueryParams } from "@/types/api/integrity";
 
 import type { EmployersQueryParams } from "@/types/api/employers";
@@ -104,6 +105,8 @@ export const engagementKeys = {
 export const adminManagementKeys = {
   all: ["admin-management"] as const,
   accounts: () => [...adminManagementKeys.all, "accounts"] as const,
+  list: (params?: AdminAccountsQueryParams) =>
+    [...adminManagementKeys.accounts(), params ?? {}] as const,
 };
 
 export const accountKeys = {
