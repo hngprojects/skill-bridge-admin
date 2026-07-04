@@ -50,7 +50,6 @@ export function ServerDataTable<TData>({
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     pageCount,
-    enableSorting: false,
     state: {
       pagination: { pageIndex, pageSize },
     },

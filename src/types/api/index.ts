@@ -46,4 +46,9 @@ export type {
   TalentStatus,
   EmployerStatus,
 } from "./overview";
-export type { IntegrityStats, VoidedAttempt } from "./integrity";
+export type {
+  IntegrityStats,
+  VoidedAttempt,
+  VoidedAttemptsQueryParams,
+  VoidedAttemptsPage,
+} from "./integrity";

@@ -1,6 +1,14 @@
 "use client";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { SearchIcon } from "@hugeicons/core-free-icons";
+
 import { Button } from "@/components/ui/button";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import {
   Select,
   SelectContent,
@@ -8,65 +16,75 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TALENT_TRACKS } from "@/types/api/talents";
-import type { ConfidenceLevel } from "@/types/api/talents";
 import { DateRangeInput } from "./date-range-input";
 import { FilterChip } from "./filter-chip";
 
 export type DateRange = { from: string; to: string };
 
-const CONFIDENCE_OPTIONS: ConfidenceLevel[] = ["High", "Medium", "Low"];
+const ASSESSMENT_TYPE_OPTIONS = [
+  { value: "skill", label: "Skill" },
+  { value: "advanced", label: "Advanced" },
+] as const;
 
 type IntegrityFiltersProps = {
-  confidenceFilter: string;
-  onConfidenceChange: (value: string) => void;
-  trackFilter: string;
-  onTrackChange: (value: string) => void;
+  search: string;
+  onSearchChange: (value: string) => void;
+  assessmentType: string;
+  onAssessmentTypeChange: (value: string) => void;
   dateRange: DateRange;
   onDateRangeChange: (range: DateRange) => void;
   onClearAll: () => void;
-  attemptCount: number;
+  total: number;
   isLoading: boolean;
 };
 
+function assessmentTypeLabel(value: string): string {
+  return (
+    ASSESSMENT_TYPE_OPTIONS.find((option) => option.value === value)?.label ??
+    value
+  );
+}
+
 export function IntegrityFilters({
-  confidenceFilter,
-  onConfidenceChange,
-  trackFilter,
-  onTrackChange,
+  search,
+  onSearchChange,
+  assessmentType,
+  onAssessmentTypeChange,
   dateRange,
   onDateRangeChange,
   onClearAll,
-  attemptCount,
+  total,
   isLoading,
 }: IntegrityFiltersProps) {
   const hasDateFilter = dateRange.from !== "" || dateRange.to !== "";
-  const hasActiveFilters = !!confidenceFilter || !!trackFilter || hasDateFilter;
+  const hasActiveFilters = !!search || !!assessmentType || hasDateFilter;
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
-        <Select value={confidenceFilter} onValueChange={onConfidenceChange}>
-          <SelectTrigger size="sm" className="w-40">
-            <SelectValue placeholder="Confidence" />
-          </SelectTrigger>
-          <SelectContent>
-            {CONFIDENCE_OPTIONS.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <InputGroup className="w-60">
+          <InputGroupAddon align="inline-start">
+            <HugeiconsIcon
+              icon={SearchIcon}
+              strokeWidth={2}
+              className="size-4"
+            />
+          </InputGroupAddon>
+          <InputGroupInput
+            placeholder="Search by talent name or email…"
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+          />
+        </InputGroup>
 
-        <Select value={trackFilter} onValueChange={onTrackChange}>
+        <Select value={assessmentType} onValueChange={onAssessmentTypeChange}>
           <SelectTrigger size="sm" className="w-40">
-            <SelectValue placeholder="Track" />
+            <SelectValue placeholder="Assessment type" />
           </SelectTrigger>
           <SelectContent>
-            {TALENT_TRACKS.map((t) => (
-              <SelectItem key={t} value={t}>
-                {t}
+            {ASSESSMENT_TYPE_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -77,16 +95,16 @@ export function IntegrityFilters({
 
       {hasActiveFilters && (
         <div className="flex flex-wrap items-center gap-1.5">
-          {confidenceFilter && (
+          {search && (
             <FilterChip
-              label={`Confidence: ${confidenceFilter}`}
-              onRemove={() => onConfidenceChange("")}
+              label={`Search: ${search}`}
+              onRemove={() => onSearchChange("")}
             />
           )}
-          {trackFilter && (
+          {assessmentType && (
             <FilterChip
-              label={`Track: ${trackFilter}`}
-              onRemove={() => onTrackChange("")}
+              label={`Assessment: ${assessmentTypeLabel(assessmentType)}`}
+              onRemove={() => onAssessmentTypeChange("")}
             />
           )}
           {hasDateFilter && (
@@ -103,9 +121,8 @@ export function IntegrityFilters({
 
       {!isLoading && (
         <p className="text-sm text-muted-foreground">
-          {attemptCount}{" "}
-          {attemptCount === 1 ? "voided attempt" : "voided attempts"}
-          {hasActiveFilters ? " match your filters" : " this period"}
+          {total} {total === 1 ? "voided attempt" : "voided attempts"}
+          {hasActiveFilters ? " match your filters" : " total"}
         </p>
       )}
     </div>
