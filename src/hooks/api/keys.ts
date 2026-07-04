@@ -1,3 +1,5 @@
+import type { EmployersQueryParams } from "@/types/api/employers";
+
 export const healthKeys = {
   all: ["health"] as const,
   check: () => [...healthKeys.all, "check"] as const,
@@ -73,7 +75,8 @@ export const integrityKeys = {
 export const employersKeys = {
   all: ["employers"] as const,
   lists: () => [...employersKeys.all, "list"] as const,
-  list: () => [...employersKeys.lists()] as const,
+  list: (params?: EmployersQueryParams) =>
+    [...employersKeys.lists(), params ?? {}] as const,
   details: () => [...employersKeys.all, "detail"] as const,
   detail: (id: string) => [...employersKeys.details(), id] as const,
 };

@@ -1,19 +1,9 @@
 import type { StatusPillVariant } from "@/components/shared/status-pill";
 import type {
   EmployerRoleStatus,
-  EmployerVerificationStatus,
   OfferLifecycleStatus,
 } from "@/types/api/employers";
 import type { SubscriptionStatus } from "@/types/api/talents";
-
-export const verificationVariantMap: Record<
-  EmployerVerificationStatus,
-  StatusPillVariant
-> = {
-  Verified: "success",
-  Pending: "warning",
-  Unverified: "error",
-};
 
 export const roleStatusVariantMap: Record<
   EmployerRoleStatus,
