@@ -81,7 +81,7 @@ export function getAdminAccountColumns({
       ),
     },
     {
-      accessorKey: "lastLogin",
+      accessorKey: "last_login",
       header: "Last Login",
       enableSorting: true,
       cell: ({ row }) => {
