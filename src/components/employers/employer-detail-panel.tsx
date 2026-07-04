@@ -23,8 +23,8 @@ export function EmployerDetailPanel({
     <SlideOverPanel
       open={open}
       onOpenChange={onOpenChange}
-      title={data?.companyName ?? "Employer Detail"}
-      description={data?.industry}
+      title={data?.company_profile.name ?? "Employer Detail"}
+      description={data?.company_profile.industry}
       isLoading={isLoading || (employerId !== null && !data)}
     >
       <Tabs defaultValue="profile">

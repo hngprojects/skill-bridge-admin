@@ -1,6 +1,15 @@
 "use client";
 
+import { HugeiconsIcon } from "@hugeicons/react";
+import { SearchIcon } from "@hugeicons/core-free-icons";
+
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import {
   Select,
   SelectContent,
@@ -8,163 +17,108 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  EMPLOYER_INDUSTRIES,
-  EMPLOYER_PACKAGE_TIERS,
-  EMPLOYER_REGIONS,
-} from "@/types/api/employers";
-import type { EmployerVerificationStatus } from "@/types/api/employers";
-import { ACCOUNT_AGE_BUCKETS } from "./account-age";
 import { FilterChip } from "./filter-chip";
 
-const VERIFICATION_OPTIONS: EmployerVerificationStatus[] = [
-  "Verified",
-  "Pending",
-  "Unverified",
-];
+const VERIFICATION_OPTIONS = ["Verified", "Unverified"] as const;
 
 type EmployersFiltersProps = {
-  verificationFilter: string;
+  search: string;
+  onSearchChange: (value: string) => void;
+  verification: string;
   onVerificationChange: (value: string) => void;
-  tierFilter: string;
-  onTierChange: (value: string) => void;
-  accountAgeFilter: string;
-  onAccountAgeChange: (value: string) => void;
-  regionFilter: string;
+  region: string;
   onRegionChange: (value: string) => void;
-  industryFilter: string;
+  industry: string;
   onIndustryChange: (value: string) => void;
   onClearAll: () => void;
-  employerCount: number;
+  total: number;
   isLoading: boolean;
 };
 
-function accountAgeLabel(value: string): string {
-  return ACCOUNT_AGE_BUCKETS.find((b) => b.value === value)?.label ?? value;
-}
-
 export function EmployersFilters({
-  verificationFilter,
+  search,
+  onSearchChange,
+  verification,
   onVerificationChange,
-  tierFilter,
-  onTierChange,
-  accountAgeFilter,
-  onAccountAgeChange,
-  regionFilter,
+  region,
   onRegionChange,
-  industryFilter,
+  industry,
   onIndustryChange,
   onClearAll,
-  employerCount,
+  total,
   isLoading,
 }: EmployersFiltersProps) {
-  const hasActiveFilters =
-    !!verificationFilter ||
-    !!tierFilter ||
-    !!accountAgeFilter ||
-    !!regionFilter ||
-    !!industryFilter;
+  const hasActiveFilters = !!search || !!verification || !!region || !!industry;
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Controls row */}
       <div className="flex flex-wrap items-center gap-2">
-        <Select value={verificationFilter} onValueChange={onVerificationChange}>
+        <InputGroup className="w-60">
+          <InputGroupAddon align="inline-start">
+            <HugeiconsIcon
+              icon={SearchIcon}
+              strokeWidth={2}
+              className="size-4"
+            />
+          </InputGroupAddon>
+          <InputGroupInput
+            placeholder="Search by company name…"
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+          />
+        </InputGroup>
+
+        <Select value={verification} onValueChange={onVerificationChange}>
           <SelectTrigger size="sm" className="w-40">
             <SelectValue placeholder="Verification" />
           </SelectTrigger>
           <SelectContent>
-            {VERIFICATION_OPTIONS.map((v) => (
-              <SelectItem key={v} value={v}>
-                {v}
+            {VERIFICATION_OPTIONS.map((option) => (
+              <SelectItem key={option} value={option}>
+                {option}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
-        <Select value={tierFilter} onValueChange={onTierChange}>
-          <SelectTrigger size="sm" className="w-36">
-            <SelectValue placeholder="Package Tier" />
-          </SelectTrigger>
-          <SelectContent>
-            {EMPLOYER_PACKAGE_TIERS.map((t) => (
-              <SelectItem key={t} value={t}>
-                {t}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Input
+          className="h-8 w-40"
+          placeholder="Region"
+          value={region}
+          onChange={(e) => onRegionChange(e.target.value)}
+        />
 
-        <Select value={accountAgeFilter} onValueChange={onAccountAgeChange}>
-          <SelectTrigger size="sm" className="w-36">
-            <SelectValue placeholder="Account Age" />
-          </SelectTrigger>
-          <SelectContent>
-            {ACCOUNT_AGE_BUCKETS.map((b) => (
-              <SelectItem key={b.value} value={b.value}>
-                {b.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={regionFilter} onValueChange={onRegionChange}>
-          <SelectTrigger size="sm" className="w-40">
-            <SelectValue placeholder="Region" />
-          </SelectTrigger>
-          <SelectContent>
-            {EMPLOYER_REGIONS.map((r) => (
-              <SelectItem key={r} value={r}>
-                {r}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select value={industryFilter} onValueChange={onIndustryChange}>
-          <SelectTrigger size="sm" className="w-36">
-            <SelectValue placeholder="Industry" />
-          </SelectTrigger>
-          <SelectContent>
-            {EMPLOYER_INDUSTRIES.map((i) => (
-              <SelectItem key={i} value={i}>
-                {i}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Input
+          className="h-8 w-40"
+          placeholder="Industry"
+          value={industry}
+          onChange={(e) => onIndustryChange(e.target.value)}
+        />
       </div>
 
-      {/* Active chips */}
       {hasActiveFilters && (
         <div className="flex flex-wrap items-center gap-1.5">
-          {verificationFilter && (
+          {search && (
             <FilterChip
-              label={`Verification: ${verificationFilter}`}
+              label={`Search: ${search}`}
+              onRemove={() => onSearchChange("")}
+            />
+          )}
+          {verification && (
+            <FilterChip
+              label={`Verification: ${verification}`}
               onRemove={() => onVerificationChange("")}
             />
           )}
-          {tierFilter && (
+          {region && (
             <FilterChip
-              label={`Tier: ${tierFilter}`}
-              onRemove={() => onTierChange("")}
-            />
-          )}
-          {accountAgeFilter && (
-            <FilterChip
-              label={`Age: ${accountAgeLabel(accountAgeFilter)}`}
-              onRemove={() => onAccountAgeChange("")}
-            />
-          )}
-          {regionFilter && (
-            <FilterChip
-              label={`Region: ${regionFilter}`}
+              label={`Region: ${region}`}
               onRemove={() => onRegionChange("")}
             />
           )}
-          {industryFilter && (
+          {industry && (
             <FilterChip
-              label={`Industry: ${industryFilter}`}
+              label={`Industry: ${industry}`}
               onRemove={() => onIndustryChange("")}
             />
           )}
@@ -174,10 +128,9 @@ export function EmployersFilters({
         </div>
       )}
 
-      {/* Employer count */}
       {!isLoading && (
         <p className="text-sm text-muted-foreground">
-          {employerCount} {employerCount === 1 ? "employer" : "employers"}
+          {total} {total === 1 ? "employer" : "employers"}
           {hasActiveFilters ? " match your filters" : " total"}
         </p>
       )}
