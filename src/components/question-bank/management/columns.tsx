@@ -1,88 +1,76 @@
+import { format } from "date-fns";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { StatusPill } from "@/components/shared/status-pill";
-import type { StatusPillVariant } from "@/components/shared/status-pill";
-import type {
-  Question,
-  QuestionStatus,
-  QuestionSource,
-} from "@/types/api/question-bank";
+import type { Question } from "@/types/api/question-bank";
 
-function statusVariant(status: QuestionStatus): StatusPillVariant {
-  if (status === "Active") return "success";
-  if (status === "Flagged") return "warning";
-  return "muted";
-}
-
-function sourceVariant(source: QuestionSource): StatusPillVariant {
-  if (source === "AI-generated") return "info";
-  if (source === "Imported") return "default";
-  return "muted";
+function snakeToTitle(value: string): string {
+  return value
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 }
 
 export const questionColumns: ColumnDef<Question>[] = [
   {
-    accessorKey: "text",
+    accessorKey: "question_text",
     header: "Question",
     cell: ({ row }) => (
-      <span className="line-clamp-2 max-w-xs text-sm">{row.original.text}</span>
+      <span className="line-clamp-2 max-w-xs text-sm">
+        {row.original.question_text}
+      </span>
     ),
     enableSorting: false,
   },
   {
+    accessorKey: "assessment_type",
+    header: "Type",
+    cell: ({ row }) => snakeToTitle(row.original.assessment_type),
+  },
+  {
     accessorKey: "track",
     header: "Track",
-    filterFn: "exact",
+    cell: ({ row }) => snakeToTitle(row.original.track),
   },
   {
-    accessorKey: "stage",
-    header: "Stage",
-    filterFn: "exact",
-  },
-  {
-    accessorKey: "level",
+    accessorKey: "verified_level",
     header: "Level",
-    filterFn: "exact",
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    filterFn: "exact",
     cell: ({ row }) => (
-      <StatusPill
-        status={row.original.status}
-        variant={statusVariant(row.original.status)}
-      />
+      <span className="capitalize">{row.original.verified_level}</span>
     ),
   },
   {
-    accessorKey: "dateAdded",
-    header: "Date Added",
+    accessorKey: "competency",
+    header: "Competency",
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">
+        {snakeToTitle(row.original.competency)}
+      </span>
+    ),
+    enableSorting: false,
+  },
+  {
+    accessorKey: "is_live",
+    header: "Live",
     cell: ({ row }) =>
-      new Date(row.original.dateAdded).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }),
+      row.original.is_live ? (
+        <StatusPill status="Live" variant="success" />
+      ) : (
+        <StatusPill status="Off" variant="muted" />
+      ),
   },
   {
     accessorKey: "source",
     header: "Source",
     cell: ({ row }) => (
-      <StatusPill
-        status={row.original.source}
-        variant={sourceVariant(row.original.source)}
-      />
+      <span className="capitalize text-sm text-muted-foreground">
+        {snakeToTitle(row.original.source)}
+      </span>
     ),
   },
   {
-    id: "flagged",
-    header: "Flagged",
-    cell: ({ row }) =>
-      row.original.flagHistory.some((f) => f.status === "Open") ? (
-        <StatusPill status="Yes" variant="warning" />
-      ) : (
-        <span className="text-sm text-muted-foreground">—</span>
-      ),
+    accessorKey: "created_at",
+    header: "Added",
+    cell: ({ row }) => format(new Date(row.original.created_at), "MMM d, yyyy"),
   },
 ];

@@ -1,33 +1,32 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { StatusPill } from "@/components/shared/status-pill";
-import type { SupportTicket, TicketStatus } from "@/types/api/support";
+import type { TicketListItem, TicketStatus } from "@/types/api/support";
+import { TICKET_STATUS_LABELS, TICKET_TYPE_LABELS } from "@/types/api/support";
 
 function statusVariant(status: TicketStatus) {
-  if (status === "Open") return "warning";
-  if (status === "In Progress") return "info";
+  if (status === "open") return "warning";
+  if (status === "in_progress") return "info";
   return "success";
 }
 
-export const supportColumns: ColumnDef<SupportTicket>[] = [
+export const supportColumns: ColumnDef<TicketListItem>[] = [
   {
-    accessorKey: "ticketNumber",
+    accessorKey: "ticket_id",
     header: "Ticket ID",
-    enableGlobalFilter: false,
     cell: ({ row }) => (
       <span className="font-mono text-xs text-muted-foreground">
-        {row.original.ticketNumber}
+        {row.original.ticket_id}
       </span>
     ),
   },
   {
-    accessorKey: "submittedBy",
+    accessorKey: "submitted_by",
     header: "Submitted By",
-    enableGlobalFilter: true,
     cell: ({ row }) => (
       <div>
-        <p className="font-medium">{row.original.submittedBy}</p>
+        <p className="font-medium">{row.original.submitted_by.name}</p>
         <p className="text-xs capitalize text-muted-foreground">
-          {row.original.submitterType}
+          {row.original.submitted_by.role}
         </p>
       </div>
     ),
@@ -35,13 +34,12 @@ export const supportColumns: ColumnDef<SupportTicket>[] = [
   {
     accessorKey: "type",
     header: "Type",
-    filterFn: "exact",
-    enableGlobalFilter: false,
+    cell: ({ row }) =>
+      TICKET_TYPE_LABELS[row.original.type] ?? row.original.type,
   },
   {
     accessorKey: "subject",
     header: "Subject",
-    enableGlobalFilter: false,
     cell: ({ row }) => (
       <span className="line-clamp-1 max-w-56">{row.original.subject}</span>
     ),
@@ -49,32 +47,28 @@ export const supportColumns: ColumnDef<SupportTicket>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    filterFn: "exact",
-    enableGlobalFilter: false,
     cell: ({ row }) => (
       <StatusPill
-        status={row.original.status}
+        status={TICKET_STATUS_LABELS[row.original.status]}
         variant={statusVariant(row.original.status)}
       />
     ),
   },
   {
-    accessorKey: "dateSubmitted",
+    accessorKey: "date_submitted",
     header: "Date Submitted",
-    enableGlobalFilter: false,
     cell: ({ row }) =>
-      new Date(row.original.dateSubmitted).toLocaleDateString("en-GB", {
+      new Date(row.original.date_submitted).toLocaleDateString("en-GB", {
         day: "numeric",
         month: "short",
         year: "numeric",
       }),
   },
   {
-    accessorKey: "assignedAdmin",
+    accessorKey: "assigned_admin",
     header: "Assigned Admin",
-    enableGlobalFilter: false,
     cell: ({ row }) =>
-      row.original.assignedAdmin ?? (
+      row.original.assigned_admin?.name ?? (
         <span className="text-muted-foreground">—</span>
       ),
   },

@@ -1,65 +1,76 @@
-import type { TalentTrack } from "@/types/api/talents";
+// ── Question list ────────────────────────────────────────────────────────────
 
-export type { TalentTrack as QuestionTrack };
+export type QuestionType = "required_text" | "single_pick" | "optional_text";
+export type QuestionSlotType = "situational" | "work_task";
 
-export type QuestionStage = "Stage 1" | "Stage 2" | "Stage 3";
-export type QuestionLevel = "Junior" | "Mid" | "Senior";
-export type QuestionStatus = "Active" | "Flagged" | "Removed";
-export type QuestionSource = "Manual" | "AI-generated" | "Imported";
+export type Question = {
+  id: string;
+  assessment_type: string;
+  question_type: QuestionType;
+  question_text: string;
+  question_number: number;
+  track: string;
+  verified_level: string;
+  competency: string;
+  slot_type: QuestionSlotType;
+  is_live: boolean;
+  review_status: string;
+  source: string;
+  added_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type QuestionsPage = {
+  items: Question[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type QuestionsQueryParams = {
+  page?: number;
+  limit?: number;
+  assessment_type?: string;
+  track?: string;
+  verified_level?: string;
+  search?: string;
+};
+
+// ── Health grid ───────────────────────────────────────────────────────────────
+
+export type HealthCell = {
+  assessment_type: string;
+  track: string;
+  verified_level: string;
+  live_count: number;
+  flagged_count: number;
+  removed_count: number;
+  total_count: number;
+  is_empty: boolean;
+};
+
+export type HealthGrid = {
+  target_defined: boolean;
+  cells: HealthCell[];
+};
+
+// ── Quality notes (mock until endpoint available) ─────────────────────────────
+
 export type FlagReason =
   | "Miscalibrated"
   | "Wrong track match"
   | "Ambiguous"
   | "Other";
 export type NoteStatus = "Open" | "Resolved";
-export type HealthStatus = "Healthy" | "Warning" | "Critical";
-
-export type AnswerOption = {
-  id: string;
-  text: string;
-};
-
-export type FlagEntry = {
-  id: string;
-  reason: FlagReason;
-  note: string;
-  loggedBy: string;
-  date: string;
-  status: NoteStatus;
-};
-
-export type Question = {
-  id: string;
-  text: string;
-  options: AnswerOption[];
-  correctAnswerId: string;
-  track: TalentTrack;
-  stage: QuestionStage;
-  level: QuestionLevel;
-  status: QuestionStatus;
-  source: QuestionSource;
-  dateAdded: string;
-  addedBy: string;
-  flagHistory: FlagEntry[];
-};
-
-export type HealthRow = {
-  track: TalentTrack;
-  stage: QuestionStage;
-  level: QuestionLevel;
-  remaining: number;
-  total: number;
-  percentage: number;
-  status: HealthStatus;
-};
 
 export type QualityNote = {
   id: string;
   questionId: string;
   questionPreview: string;
-  track: TalentTrack;
-  stage: QuestionStage;
-  level: QuestionLevel;
+  track: string;
+  stage: string;
+  level: string;
   reason: FlagReason;
   note: string;
   loggedBy: string;
@@ -67,16 +78,22 @@ export type QualityNote = {
   status: NoteStatus;
 };
 
+// ── AI generation log (mock until endpoint available) ─────────────────────────
+
 export type AIGenerationLog = {
   id: string;
   triggeredBy: string;
   timestamp: string;
-  track: TalentTrack;
-  stage: QuestionStage;
-  level: QuestionLevel;
+  track: string;
+  stage: string;
+  level: string;
   countRequested: number;
   countAccepted: number;
 };
+
+// ── AI generation preview (used in generate modal) ────────────────────────────
+
+export type AnswerOption = { id: string; text: string };
 
 export type GeneratedQuestionPreview = {
   id: string;

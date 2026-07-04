@@ -1,10 +1,30 @@
-import type { IntegrityStats, VoidedAttempt } from "@/types/api/integrity";
-import { MOCK_INTEGRITY_STATS, MOCK_VOIDED_ATTEMPTS } from "@/mocks/integrity";
+"use server";
+
+import type {
+  GetIntegrityStatsResponse,
+  GetVoidedAttemptsResponse,
+  IntegrityStats,
+  VoidedAttemptsPage,
+  VoidedAttemptsQueryParams,
+} from "@/types/api/integrity";
+import { authApi } from "@/lib/api/clients";
+import { unwrapData } from "./utils";
 
 export async function getIntegrityStats(): Promise<IntegrityStats> {
-  return MOCK_INTEGRITY_STATS;
+  const res = await authApi.get<GetIntegrityStatsResponse>(
+    "/admin/integrity/stats",
+  );
+
+  return unwrapData(res);
 }
 
-export async function getVoidedAttempts(): Promise<VoidedAttempt[]> {
-  return MOCK_VOIDED_ATTEMPTS;
+export async function getVoidedAttempts(
+  params: VoidedAttemptsQueryParams = {},
+): Promise<VoidedAttemptsPage> {
+  const res = await authApi.get<GetVoidedAttemptsResponse>(
+    "/admin/integrity/voided-attempts",
+    { params },
+  );
+
+  return unwrapData(res);
 }

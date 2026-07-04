@@ -13,7 +13,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { StatusPill } from "@/components/shared/status-pill";
-import type { FlagEntry } from "@/types/api/question-bank";
+type FlagEntry = {
+  id: string;
+  reason: string;
+  note: string;
+  loggedBy: string;
+  date: string;
+  status: string;
+};
 
 // ---------------------------------------------------------------------------
 // Answer options (view + edit mode)

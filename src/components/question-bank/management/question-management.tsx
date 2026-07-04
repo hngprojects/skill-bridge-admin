@@ -1,44 +1,19 @@
 "use client";
 
 import * as React from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 
-import { DataTable } from "@/components/shared/data-table";
-import type { FilterConfig } from "@/components/shared/data-table";
-import { Button } from "@/components/ui/button";
+import { ServerDataTable } from "@/components/shared/server-data-table";
+import { useDebounce } from "@/hooks/use-debounce";
 import { useQuestions } from "@/hooks/api/use-question-bank";
 import type { Question } from "@/types/api/question-bank";
-import { TALENT_TRACKS } from "@/types/api/talents";
+import { DEFAULT_PAGE_SIZE } from "@/constants/pagination";
 import { questionColumns } from "./columns";
 import { QuestionDetailPanel } from "./question-detail-panel";
 import { AddQuestionModal } from "./add-question-modal";
 import { GenerateQuestionsModal } from "./generate-questions-modal";
-
-const STAGES = ["Stage 1", "Stage 2", "Stage 3"] as const;
-const LEVELS = ["Junior", "Mid", "Senior"] as const;
-const STATUSES = ["Active", "Flagged", "Removed"] as const;
-
-const FILTERS: FilterConfig[] = [
-  {
-    id: "track",
-    label: "Track",
-    options: TALENT_TRACKS.map((t) => ({ label: t, value: t })),
-  },
-  {
-    id: "stage",
-    label: "Stage",
-    options: STAGES.map((s) => ({ label: s, value: s })),
-  },
-  {
-    id: "level",
-    label: "Level",
-    options: LEVELS.map((l) => ({ label: l, value: l })),
-  },
-  {
-    id: "status",
-    label: "Status",
-    options: STATUSES.map((s) => ({ label: s, value: s })),
-  },
-];
+import { QuestionManagementToolbar } from "./question-management-toolbar";
+import { readParams } from "./question-management-params";
 
 type QuestionManagementProps = {
   isReadOnly: boolean;
@@ -55,32 +30,90 @@ export function QuestionManagement({
   onOpenPanel,
   onClosePanel,
 }: QuestionManagementProps) {
-  const { data: questions = [], isLoading } = useQuestions();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const params = React.useMemo(
+    () => readParams((key) => searchParams.get(key)),
+    [searchParams],
+  );
+
+  const { data, isLoading } = useQuestions(params);
+  const questions = data?.items ?? [];
+  const total = data?.total ?? 0;
+  const totalPages = data
+    ? Math.ceil(data.total / (data.limit || DEFAULT_PAGE_SIZE))
+    : 0;
+
   const [addOpen, setAddOpen] = React.useState(false);
   const [generateOpen, setGenerateOpen] = React.useState(false);
 
+  function setParams(updates: Record<string, string | null>) {
+    const next = new URLSearchParams(searchParams.toString());
+    for (const [key, value] of Object.entries(updates)) {
+      if (value === null || value === "") next.delete(key);
+      else next.set(key, value);
+    }
+    const query = next.toString();
+    window.history.replaceState(
+      null,
+      "",
+      query ? `${pathname}?${query}` : pathname,
+    );
+  }
+
+  const [searchInput, setSearchInput] = React.useState(
+    () => searchParams.get("qb_search") ?? "",
+  );
+  const debouncedSearch = useDebounce(searchInput, 300);
+  const prevSearch = React.useRef(debouncedSearch);
+
+  React.useEffect(() => {
+    if (debouncedSearch !== prevSearch.current) {
+      prevSearch.current = debouncedSearch;
+      setParams({ qb_search: debouncedSearch || null, qb_page: null });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
+
+  function handleAssessmentChange(value: string) {
+    setParams({ qb_assessment: value || null, qb_page: null });
+  }
+
+  function handleLevelChange(value: string) {
+    setParams({ qb_level: value || null, qb_page: null });
+  }
+
+  function handlePageChange(pageIndex: number) {
+    const nextPage = pageIndex + 1;
+    setParams({ qb_page: nextPage > 1 ? String(nextPage) : null });
+  }
+
   return (
     <div className="flex flex-col gap-4">
-      {!isReadOnly && (
-        <div className="flex items-center justify-end gap-2">
-          <Button variant="outline" onClick={() => setGenerateOpen(true)}>
-            Generate with AI
-          </Button>
-          <Button onClick={() => setAddOpen(true)}>
-            Add Question Manually
-          </Button>
-        </div>
-      )}
+      <QuestionManagementToolbar
+        searchInput={searchInput}
+        onSearchChange={setSearchInput}
+        assessmentFilter={params.assessment_type ?? ""}
+        onAssessmentChange={handleAssessmentChange}
+        levelFilter={params.verified_level ?? ""}
+        onLevelChange={handleLevelChange}
+        isLoading={isLoading}
+        total={total}
+        isReadOnly={isReadOnly}
+        onAddClick={() => setAddOpen(true)}
+        onGenerateClick={() => setGenerateOpen(true)}
+      />
 
-      <DataTable
+      <ServerDataTable
         columns={questionColumns}
         data={questions}
+        pageIndex={(params.page ?? 1) - 1}
+        pageCount={totalPages}
+        onPageChange={handlePageChange}
         isLoading={isLoading}
-        searchPlaceholder="Search questions…"
-        filters={FILTERS}
-        pageSize={20}
         emptyTitle="No questions found"
-        emptyMessage="Try adjusting your filters or add a question manually."
+        emptyMessage="Try adjusting your filters."
         onRowClick={onOpenPanel}
       />
 

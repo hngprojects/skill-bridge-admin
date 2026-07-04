@@ -38,9 +38,9 @@ export default async function SettingsPage() {
       </div>
 
       <AccountSettingsShell
-        name={session?.user?.name}
-        email={session?.user?.email}
-        role={role}
+        sessionName={session?.user?.name}
+        sessionEmail={session?.user?.email}
+        sessionRole={role}
       />
     </div>
   );

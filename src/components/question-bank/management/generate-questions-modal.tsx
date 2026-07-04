@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
-import { getMockGeneratedQuestions } from "@/mocks/question-bank";
+import { getMockGeneratedQuestions } from "@/mocks/generated-questions";
 import type { GeneratedQuestionPreview } from "@/types/api/question-bank";
 import type { TalentTrack } from "@/types/api/talents";
 import { GenerateConfigStep } from "./generate-steps";

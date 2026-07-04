@@ -1,7 +1,12 @@
 "use client";
 
 import * as React from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
+import { addQuestion } from "@/actions/question-bank";
+import type { AddQuestionPayload } from "@/actions/question-bank";
+import { questionBankKeys } from "@/hooks/api/keys";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,40 +33,74 @@ export function AddQuestionModal({
   open,
   onOpenChange,
 }: AddQuestionModalProps) {
+  const [assessmentType, setAssessmentType] = React.useState("");
+  const [questionType, setQuestionType] = React.useState("");
   const [track, setTrack] = React.useState("");
-  const [stage, setStage] = React.useState("");
-  const [level, setLevel] = React.useState("");
+  const [verifiedLevel, setVerifiedLevel] = React.useState("");
   const [questionText, setQuestionText] = React.useState("");
   const [options, setOptions] = React.useState<AnswerOption[]>(INITIAL_OPTIONS);
   const [correctId, setCorrectId] = React.useState("");
-  const [notes, setNotes] = React.useState("");
+  const [competency, setCompetency] = React.useState("");
+  const [slotType, setSlotType] = React.useState("");
 
+  const queryClient = useQueryClient();
+
+  const isMcq = questionType === "single_pick" || questionType === "multi_pick";
   const filledOptions = options.filter((o) => o.text.trim() !== "");
+
   const canSave =
+    assessmentType !== "" &&
+    questionType !== "" &&
     track !== "" &&
-    stage !== "" &&
-    level !== "" &&
+    verifiedLevel !== "" &&
     questionText.trim() !== "" &&
-    filledOptions.length >= 2 &&
-    correctId !== "" &&
-    filledOptions.some((o) => o.id === correctId);
+    (!isMcq || filledOptions.length >= 2) &&
+    (questionType !== "single_pick" ||
+      (correctId !== "" && filledOptions.some((o) => o.id === correctId)));
+
+  const mutation = useMutation({
+    mutationFn: (payload: AddQuestionPayload) => addQuestion(payload),
+    onSuccess: () => {
+      toast.success("Question added to the bank.");
+      queryClient.invalidateQueries({ queryKey: questionBankKeys.questions() });
+      queryClient.invalidateQueries({ queryKey: questionBankKeys.health() });
+      handleOpenChange(false);
+    },
+    onError: () => {
+      toast.error("Failed to add question. Please try again.");
+    },
+  });
 
   function resetForm() {
+    setAssessmentType("");
+    setQuestionType("");
     setTrack("");
-    setStage("");
-    setLevel("");
+    setVerifiedLevel("");
     setQuestionText("");
     setOptions([
       { id: "opt-1", text: "" },
       { id: "opt-2", text: "" },
     ]);
     setCorrectId("");
-    setNotes("");
+    setCompetency("");
+    setSlotType("");
   }
 
   function handleOpenChange(next: boolean) {
     if (!next) resetForm();
     onOpenChange(next);
+  }
+
+  function handleQuestionTypeChange(v: string) {
+    setQuestionType(v);
+    // Clear MCQ-specific state when switching away from MCQ types
+    if (v !== "single_pick" && v !== "multi_pick") {
+      setOptions([
+        { id: "opt-1", text: "" },
+        { id: "opt-2", text: "" },
+      ]);
+      setCorrectId("");
+    }
   }
 
   function addOption() {
@@ -78,9 +117,26 @@ export function AddQuestionModal({
   }
 
   function handleSave() {
-    // TODO: mutation — create question with status=Active, source=Manual
-    onOpenChange(false);
-    resetForm();
+    const payload: AddQuestionPayload = {
+      assessmentType: assessmentType as AddQuestionPayload["assessmentType"],
+      questionType: questionType as AddQuestionPayload["questionType"],
+      questionText: questionText.trim(),
+      track,
+      verifiedLevel: verifiedLevel as AddQuestionPayload["verifiedLevel"],
+    };
+
+    if (isMcq) {
+      payload.options = filledOptions.map((o) => o.text);
+      if (questionType === "single_pick" && correctId) {
+        const correct = filledOptions.find((o) => o.id === correctId);
+        if (correct) payload.correctAnswer = correct.text;
+      }
+    }
+
+    if (competency.trim()) payload.competency = competency.trim();
+    if (slotType) payload.slotType = slotType as AddQuestionPayload["slotType"];
+
+    mutation.mutate(payload);
   }
 
   return (
@@ -91,31 +147,42 @@ export function AddQuestionModal({
         </DialogHeader>
 
         <AddQuestionForm
+          assessmentType={assessmentType}
+          questionType={questionType}
           track={track}
-          stage={stage}
-          level={level}
+          verifiedLevel={verifiedLevel}
           questionText={questionText}
           options={options}
           correctId={correctId}
-          notes={notes}
+          competency={competency}
+          slotType={slotType}
           filledOptions={filledOptions}
+          onAssessmentTypeChange={setAssessmentType}
+          onQuestionTypeChange={handleQuestionTypeChange}
           onTrackChange={setTrack}
-          onStageChange={setStage}
-          onLevelChange={setLevel}
+          onVerifiedLevelChange={setVerifiedLevel}
           onQuestionTextChange={setQuestionText}
           onUpdateOption={updateOption}
           onAddOption={addOption}
           onRemoveOption={removeOption}
           onCorrectIdChange={setCorrectId}
-          onNotesChange={setNotes}
+          onCompetencyChange={setCompetency}
+          onSlotTypeChange={setSlotType}
         />
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => handleOpenChange(false)}>
+          <Button
+            variant="outline"
+            onClick={() => handleOpenChange(false)}
+            disabled={mutation.isPending}
+          >
             Cancel
           </Button>
-          <Button disabled={!canSave} onClick={handleSave}>
-            Save question
+          <Button
+            disabled={!canSave || mutation.isPending}
+            onClick={handleSave}
+          >
+            {mutation.isPending ? "Saving…" : "Save question"}
           </Button>
         </DialogFooter>
       </DialogContent>
