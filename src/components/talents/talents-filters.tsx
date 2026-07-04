@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -8,8 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TALENT_TRACKS } from "@/types/api/talents";
-import type { TalentTier } from "@/types/api/talents";
+import { TALENT_TRACKS, TRACK_LABELS } from "@/types/api/talents";
+import type { TierFilterParam } from "@/types/api/talents";
 import { DateRangeInput } from "./date-range-input";
 import { FilterChip } from "./filter-chip";
 import { ScoreRangeInput } from "./score-range-input";
@@ -17,9 +18,18 @@ import { ScoreRangeInput } from "./score-range-input";
 export type ScoreRange = { min: string; max: string };
 export type DateRange = { from: string; to: string };
 
-const TIER_OPTIONS: TalentTier[] = ["Rejected", "Emerging", "Job Ready"];
+const TIER_OPTIONS: { value: TierFilterParam; label: string }[] = [
+  { value: "not_ready", label: "Rejected" },
+  { value: "emerging", label: "Emerging" },
+  { value: "job_ready", label: "Job Ready" },
+];
+
+const tierLabel = (tier: string) =>
+  TIER_OPTIONS.find((o) => o.value === tier)?.label ?? tier;
 
 type TalentsFiltersProps = {
+  search: string;
+  onSearchChange: (value: string) => void;
   trackFilter: string;
   onTrackChange: (value: string) => void;
   tierFilter: string;
@@ -34,6 +44,8 @@ type TalentsFiltersProps = {
 };
 
 export function TalentsFilters({
+  search,
+  onSearchChange,
   trackFilter,
   onTrackChange,
   tierFilter,
@@ -49,7 +61,11 @@ export function TalentsFilters({
   const hasScoreFilter = scoreRange.min !== "" || scoreRange.max !== "";
   const hasDateFilter = dateRange.from !== "" || dateRange.to !== "";
   const hasActiveFilters =
-    !!trackFilter || !!tierFilter || hasScoreFilter || hasDateFilter;
+    !!search ||
+    !!trackFilter ||
+    !!tierFilter ||
+    hasScoreFilter ||
+    hasDateFilter;
 
   const scoreChipLabel =
     scoreRange.min !== "" && scoreRange.max !== ""
@@ -62,6 +78,13 @@ export function TalentsFilters({
     <div className="flex flex-col gap-3">
       {/* Controls row */}
       <div className="flex flex-wrap items-center gap-2">
+        <Input
+          className="h-8 w-56 text-sm"
+          placeholder="Search by name or email…"
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
+
         <Select value={trackFilter} onValueChange={onTrackChange}>
           <SelectTrigger size="sm" className="w-40">
             <SelectValue placeholder="Track" />
@@ -69,7 +92,7 @@ export function TalentsFilters({
           <SelectContent>
             {TALENT_TRACKS.map((t) => (
               <SelectItem key={t} value={t}>
-                {t}
+                {TRACK_LABELS[t]}
               </SelectItem>
             ))}
           </SelectContent>
@@ -81,8 +104,8 @@ export function TalentsFilters({
           </SelectTrigger>
           <SelectContent>
             {TIER_OPTIONS.map((t) => (
-              <SelectItem key={t} value={t}>
-                {t}
+              <SelectItem key={t.value} value={t.value}>
+                {t.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -96,6 +119,12 @@ export function TalentsFilters({
       {/* Active chips */}
       {hasActiveFilters && (
         <div className="flex flex-wrap items-center gap-1.5">
+          {search && (
+            <FilterChip
+              label={`Search: ${search}`}
+              onRemove={() => onSearchChange("")}
+            />
+          )}
           {trackFilter && (
             <FilterChip
               label={`Track: ${trackFilter}`}
@@ -104,7 +133,7 @@ export function TalentsFilters({
           )}
           {tierFilter && (
             <FilterChip
-              label={`Tier: ${tierFilter}`}
+              label={`Tier: ${tierLabel(tierFilter)}`}
               onRemove={() => onTierChange("")}
             />
           )}

@@ -10,10 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TALENT_TRACKS } from "@/types/api/talents";
-import type { QuestionLevel, QuestionStage } from "@/types/api/question-bank";
-
-const STAGES: QuestionStage[] = ["Stage 1", "Stage 2", "Stage 3"];
-const LEVELS: QuestionLevel[] = ["Junior", "Mid", "Senior"];
+const STAGES = ["Stage 1", "Stage 2", "Stage 3"] as const;
+const LEVELS = ["Junior", "Mid", "Senior"] as const;
 
 type AnswerOption = { id: string; text: string };
 

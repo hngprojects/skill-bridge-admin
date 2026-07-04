@@ -193,7 +193,7 @@ export const MOCK_VOIDED_ATTEMPTS: VoidedAttempt[] = VOIDED_SOURCE.map(
       id: `va-${source.talentId}`,
       candidateId: source.talentId,
       candidateName: talent?.name ?? "Unknown Candidate",
-      track: talent?.track ?? "Frontend",
+      track: talent?.track ?? "frontend_developer",
       violationCount: source.violationCount,
       confidenceLevel: source.confidenceLevel,
       sessionDate: source.sessionDate,

@@ -1,4 +1,6 @@
 import type { EmployersQueryParams } from "@/types/api/employers";
+import type { TalentsQueryParams } from "@/types/api/talents";
+import type { QuestionsQueryParams } from "@/types/api/question-bank";
 
 export const healthKeys = {
   all: ["health"] as const,
@@ -27,7 +29,8 @@ export const overviewKeys = {
 export const questionBankKeys = {
   all: ["question-bank"] as const,
   health: () => [...questionBankKeys.all, "health"] as const,
-  questions: () => [...questionBankKeys.all, "questions"] as const,
+  questions: (params?: QuestionsQueryParams) =>
+    [...questionBankKeys.all, "questions", params ?? {}] as const,
   qualityNotes: () => [...questionBankKeys.all, "quality-notes"] as const,
   aiLogs: () => [...questionBankKeys.all, "ai-logs"] as const,
 };
@@ -40,7 +43,8 @@ export const supportKeys = {
 export const talentsKeys = {
   all: ["talents"] as const,
   lists: () => [...talentsKeys.all, "list"] as const,
-  list: () => [...talentsKeys.lists()] as const,
+  list: (params?: TalentsQueryParams) =>
+    [...talentsKeys.lists(), params ?? {}] as const,
   details: () => [...talentsKeys.all, "detail"] as const,
   detail: (id: string) => [...talentsKeys.details(), id] as const,
 };

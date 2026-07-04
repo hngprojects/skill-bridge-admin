@@ -7,13 +7,11 @@ import type { FilterConfig } from "@/components/shared/data-table";
 import { StatusPill } from "@/components/shared/status-pill";
 import { Button } from "@/components/ui/button";
 import { useQualityNotes } from "@/hooks/api/use-question-bank";
-import { useQuestions } from "@/hooks/api/use-question-bank";
 import type {
   QualityNote,
   FlagReason,
   NoteStatus,
 } from "@/types/api/question-bank";
-import type { Question } from "@/types/api/question-bank";
 import { TALENT_TRACKS } from "@/types/api/talents";
 
 const STAGES = ["Stage 1", "Stage 2", "Stage 3"] as const;
@@ -50,7 +48,6 @@ const FILTERS: FilterConfig[] = [
 
 type QualityNotesLogProps = {
   isReadOnly: boolean;
-  onViewQuestion: (question: Question) => void;
 };
 
 function buildColumns(
@@ -146,21 +143,17 @@ function buildColumns(
   ];
 }
 
-export function QualityNotesLog({
-  isReadOnly,
-  onViewQuestion,
-}: QualityNotesLogProps) {
+export function QualityNotesLog({ isReadOnly }: QualityNotesLogProps) {
   const { data: notes = [], isLoading } = useQualityNotes();
-  const { data: questions = [] } = useQuestions();
 
   function handleResolve(noteId: string) {
-    // TODO: call mutation — set note status to "Resolved"
+    // TODO: mutation — set note status to "Resolved"
     console.log("resolve", noteId);
   }
 
+  // Quality notes still use mock data — question lookup not wired until endpoint available
   function handleViewQuestion(questionId: string) {
-    const question = questions.find((q) => q.id === questionId);
-    if (question) onViewQuestion(question);
+    console.log("view question", questionId);
   }
 
   const columns = buildColumns(isReadOnly, handleResolve, handleViewQuestion);
