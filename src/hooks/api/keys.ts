@@ -1,6 +1,9 @@
 import type { VoidedAttemptsQueryParams } from "@/types/api/integrity";
 
 import type { EmployersQueryParams } from "@/types/api/employers";
+import type { TalentsQueryParams } from "@/types/api/talents";
+import type { QuestionsQueryParams } from "@/types/api/question-bank";
+import type { TicketsQueryParams } from "@/types/api/support";
 
 export const healthKeys = {
   all: ["health"] as const,
@@ -29,7 +32,8 @@ export const overviewKeys = {
 export const questionBankKeys = {
   all: ["question-bank"] as const,
   health: () => [...questionBankKeys.all, "health"] as const,
-  questions: () => [...questionBankKeys.all, "questions"] as const,
+  questions: (params?: QuestionsQueryParams) =>
+    [...questionBankKeys.all, "questions", params ?? {}] as const,
   qualityNotes: () => [...questionBankKeys.all, "quality-notes"] as const,
   aiLogs: () => [...questionBankKeys.all, "ai-logs"] as const,
 };
@@ -37,12 +41,17 @@ export const questionBankKeys = {
 export const supportKeys = {
   all: ["support"] as const,
   tickets: () => [...supportKeys.all, "tickets"] as const,
+  list: (params?: TicketsQueryParams) =>
+    [...supportKeys.tickets(), params ?? {}] as const,
+  detail: (id: string) => [...supportKeys.all, "detail", id] as const,
+  assignableAdmins: () => [...supportKeys.all, "assignable-admins"] as const,
 };
 
 export const talentsKeys = {
   all: ["talents"] as const,
   lists: () => [...talentsKeys.all, "list"] as const,
-  list: () => [...talentsKeys.lists()] as const,
+  list: (params?: TalentsQueryParams) =>
+    [...talentsKeys.lists(), params ?? {}] as const,
   details: () => [...talentsKeys.all, "detail"] as const,
   detail: (id: string) => [...talentsKeys.details(), id] as const,
 };

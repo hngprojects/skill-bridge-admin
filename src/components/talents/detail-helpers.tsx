@@ -5,7 +5,15 @@ import type {
   TalentTier,
 } from "@/types/api/talents";
 
+export const tierLabels: Record<TalentTier, string> = {
+  Onboarding: "Onboarding",
+  "Job Ready": "Job Ready",
+  Emerging: "Emerging",
+  Rejected: "Rejected",
+};
+
 export const tierVariantMap: Record<TalentTier, StatusPillVariant> = {
+  Onboarding: "muted",
   "Job Ready": "success",
   Emerging: "info",
   Rejected: "error",

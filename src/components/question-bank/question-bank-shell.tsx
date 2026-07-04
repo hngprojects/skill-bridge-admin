@@ -52,13 +52,17 @@ export function QuestionBankShell({ role }: QuestionBankShellProps) {
         >
           Question Management
         </h2>
-        <QuestionManagement
-          isReadOnly={isReadOnly}
-          selectedQuestion={selectedQuestion}
-          panelOpen={panelOpen}
-          onOpenPanel={openPanel}
-          onClosePanel={closePanel}
-        />
+        <React.Suspense
+          fallback={<div className="h-64 animate-pulse rounded-2xl bg-muted" />}
+        >
+          <QuestionManagement
+            isReadOnly={isReadOnly}
+            selectedQuestion={selectedQuestion}
+            panelOpen={panelOpen}
+            onOpenPanel={openPanel}
+            onClosePanel={closePanel}
+          />
+        </React.Suspense>
       </section>
 
       <section aria-labelledby="tracking-heading">
@@ -78,7 +82,7 @@ export function QuestionBankShell({ role }: QuestionBankShellProps) {
         >
           Quality Notes Log
         </h2>
-        <QualityNotesLog isReadOnly={isReadOnly} onViewQuestion={openPanel} />
+        <QualityNotesLog isReadOnly={isReadOnly} />
       </section>
     </div>
   );

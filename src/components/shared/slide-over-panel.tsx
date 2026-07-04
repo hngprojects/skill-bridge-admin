@@ -55,9 +55,13 @@ export function SlideOverPanel({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>{title}</SheetTitle>
-          {description && <SheetDescription>{description}</SheetDescription>}
+        <SheetHeader className="min-w-0 pr-8">
+          <SheetTitle className="truncate">{title}</SheetTitle>
+          {description && (
+            <SheetDescription className="truncate">
+              {description}
+            </SheetDescription>
+          )}
         </SheetHeader>
         {isLoading ? <SlideOverSkeleton /> : children}
       </SheetContent>

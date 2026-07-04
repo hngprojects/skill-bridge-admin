@@ -16,6 +16,8 @@ export type {
   TalentTier,
   TalentTrack,
   TalentListItem,
+  TalentsQueryParams,
+  TalentsPage,
   CandidateDetail,
   ConfidenceLevel,
   SubscriptionStatus,

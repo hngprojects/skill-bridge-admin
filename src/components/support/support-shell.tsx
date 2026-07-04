@@ -2,16 +2,16 @@
 
 import * as React from "react";
 
-import type { SupportTicket } from "@/types/api/support";
+import type { TicketListItem } from "@/types/api/support";
 import { SupportTickets } from "./support-tickets";
 import { TicketDetailPanel } from "./ticket-detail-panel";
 
 export function SupportShell() {
   const [selectedTicket, setSelectedTicket] =
-    React.useState<SupportTicket | null>(null);
+    React.useState<TicketListItem | null>(null);
   const [panelOpen, setPanelOpen] = React.useState(false);
 
-  function handleOpenPanel(ticket: SupportTicket) {
+  function handleOpenPanel(ticket: TicketListItem) {
     setSelectedTicket(ticket);
     setPanelOpen(true);
   }
@@ -22,10 +22,11 @@ export function SupportShell() {
 
   return (
     <>
-      <SupportTickets
-        selectedTicket={selectedTicket}
-        onOpenPanel={handleOpenPanel}
-      />
+      <React.Suspense
+        fallback={<div className="h-64 animate-pulse rounded-2xl bg-muted" />}
+      >
+        <SupportTickets onOpenPanel={handleOpenPanel} />
+      </React.Suspense>
 
       <TicketDetailPanel
         ticket={selectedTicket}
