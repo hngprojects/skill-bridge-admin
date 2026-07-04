@@ -32,6 +32,26 @@ export async function getQuestions(
   return unwrapData(res);
 }
 
+export type AddQuestionPayload = {
+  assessmentType: "skill" | "advanced";
+  questionType:
+    | "single_pick"
+    | "multi_pick"
+    | "required_text"
+    | "optional_text";
+  questionText: string;
+  track: string;
+  verifiedLevel: "junior" | "mid" | "senior" | "expert";
+  options?: string[];
+  correctAnswer?: string;
+  competency?: string;
+  slotType?: "situational" | "work_task" | "reflection";
+};
+
+export async function addQuestion(body: AddQuestionPayload): Promise<void> {
+  await authApi.post("/admin/question-bank/questions", body);
+}
+
 // Quality notes and AI logs remain on mock until endpoints are available.
 export async function getQualityNotes(): Promise<QualityNote[]> {
   return MOCK_QUALITY_NOTES;

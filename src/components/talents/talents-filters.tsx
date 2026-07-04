@@ -1,7 +1,6 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -12,8 +11,8 @@ import {
 import { TALENT_TRACKS, TRACK_LABELS } from "@/types/api/talents";
 import type { TierFilterParam } from "@/types/api/talents";
 import { DateRangeInput } from "./date-range-input";
-import { FilterChip } from "./filter-chip";
 import { ScoreRangeInput } from "./score-range-input";
+import { ActiveFilterChips } from "./active-filter-chips";
 
 export type ScoreRange = { min: string; max: string };
 export type DateRange = { from: string; to: string };
@@ -23,9 +22,6 @@ const TIER_OPTIONS: { value: TierFilterParam; label: string }[] = [
   { value: "emerging", label: "Emerging" },
   { value: "job_ready", label: "Job Ready" },
 ];
-
-const tierLabel = (tier: string) =>
-  TIER_OPTIONS.find((o) => o.value === tier)?.label ?? tier;
 
 type TalentsFiltersProps = {
   search: string;
@@ -58,25 +54,17 @@ export function TalentsFilters({
   candidateCount,
   isLoading,
 }: TalentsFiltersProps) {
-  const hasScoreFilter = scoreRange.min !== "" || scoreRange.max !== "";
-  const hasDateFilter = dateRange.from !== "" || dateRange.to !== "";
   const hasActiveFilters =
     !!search ||
     !!trackFilter ||
     !!tierFilter ||
-    hasScoreFilter ||
-    hasDateFilter;
-
-  const scoreChipLabel =
-    scoreRange.min !== "" && scoreRange.max !== ""
-      ? `Score: ${scoreRange.min}–${scoreRange.max}`
-      : scoreRange.min !== ""
-        ? `Score ≥ ${scoreRange.min}`
-        : `Score ≤ ${scoreRange.max}`;
+    scoreRange.min !== "" ||
+    scoreRange.max !== "" ||
+    dateRange.from !== "" ||
+    dateRange.to !== "";
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Controls row */}
       <div className="flex flex-wrap items-center gap-2">
         <Input
           className="h-8 w-56 text-sm"
@@ -112,50 +100,23 @@ export function TalentsFilters({
         </Select>
 
         <ScoreRangeInput value={scoreRange} onChange={onScoreRangeChange} />
-
         <DateRangeInput value={dateRange} onChange={onDateRangeChange} />
       </div>
 
-      {/* Active chips */}
-      {hasActiveFilters && (
-        <div className="flex flex-wrap items-center gap-1.5">
-          {search && (
-            <FilterChip
-              label={`Search: ${search}`}
-              onRemove={() => onSearchChange("")}
-            />
-          )}
-          {trackFilter && (
-            <FilterChip
-              label={`Track: ${trackFilter}`}
-              onRemove={() => onTrackChange("")}
-            />
-          )}
-          {tierFilter && (
-            <FilterChip
-              label={`Tier: ${tierLabel(tierFilter)}`}
-              onRemove={() => onTierChange("")}
-            />
-          )}
-          {hasScoreFilter && (
-            <FilterChip
-              label={scoreChipLabel}
-              onRemove={() => onScoreRangeChange({ min: "", max: "" })}
-            />
-          )}
-          {hasDateFilter && (
-            <FilterChip
-              label={`Onboarded: ${dateRange.from || "start"} – ${dateRange.to || "end"}`}
-              onRemove={() => onDateRangeChange({ from: "", to: "" })}
-            />
-          )}
-          <Button variant="ghost" size="xs" onClick={onClearAll}>
-            Clear all
-          </Button>
-        </div>
-      )}
+      <ActiveFilterChips
+        search={search}
+        trackFilter={trackFilter}
+        tierFilter={tierFilter}
+        scoreRange={scoreRange}
+        dateRange={dateRange}
+        onSearchChange={onSearchChange}
+        onTrackChange={onTrackChange}
+        onTierChange={onTierChange}
+        onScoreRangeChange={onScoreRangeChange}
+        onDateRangeChange={onDateRangeChange}
+        onClearAll={onClearAll}
+      />
 
-      {/* Candidate count */}
       {!isLoading && (
         <p className="text-sm text-muted-foreground">
           {candidateCount} {candidateCount === 1 ? "candidate" : "candidates"}
