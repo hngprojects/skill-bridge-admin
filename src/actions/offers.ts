@@ -5,6 +5,11 @@ import { authApi } from "@/lib/api/clients";
 import { unwrapData } from "./utils";
 
 import type {
+  ApiOffer,
+  ApiOffersFunnel,
+  ApiOffersList,
+  ApiOffersStats,
+  ApiOffersTrend,
   OfferFunnelData,
   OfferFunnelSegmentStatus,
   OfferListItem,
@@ -17,56 +22,6 @@ import type {
 
 type Nested<T> = { status: string; data: T };
 
-type ApiTrend = {
-  direction: "up" | "down" | null;
-  change_percent: number | null;
-};
-
-type ApiStatMetric = {
-  value: number;
-  trend?: ApiTrend;
-};
-
-type ApiOffersStats = {
-  total_offers_sent: ApiStatMetric;
-  offer_to_acceptance_rate: ApiStatMetric;
-  offer_to_hire_rate: ApiStatMetric;
-  avg_time_offer_to_hire_days: ApiStatMetric;
-};
-
-type ApiFunnelStage = {
-  stage: string;
-  count: number;
-  drop_off_percent?: number;
-};
-
-type ApiOffersFunnel = {
-  stages: ApiFunnelStage[];
-  total: number;
-  empty: boolean;
-};
-
-type ApiOffer = {
-  id: string;
-  candidate_name: string;
-  employer_name: string;
-  role_title: string;
-  status: string;
-  date_sent: string;
-  date_resolved: string | null;
-};
-
-type ApiOffersList = {
-  offers: ApiOffer[];
-  pagination?: {
-    page: number;
-    limit: number;
-    total: number;
-    total_pages?: number;
-    totalPages?: number;
-  };
-};
-
 function buildDateParams(params?: OffersDateRangeParams) {
   const searchParams: Record<string, string> = {};
 
@@ -76,7 +31,7 @@ function buildDateParams(params?: OffersDateRangeParams) {
   return searchParams;
 }
 
-function trendToValue(trend?: ApiTrend): number | undefined {
+function trendToValue(trend?: ApiOffersTrend): number | undefined {
   if (!trend || trend.change_percent == null || trend.direction == null) {
     return undefined;
   }
@@ -88,7 +43,7 @@ function trendToValue(trend?: ApiTrend): number | undefined {
 
 function buildStatMetric(
   value: OfferStatMetric["value"],
-  trend?: ApiTrend,
+  trend?: ApiOffersTrend,
 ): OfferStatMetric {
   const trendValue = trendToValue(trend);
 

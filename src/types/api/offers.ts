@@ -89,3 +89,55 @@ export const OFFER_STATUSES: OfferStatus[] = [
 ];
 
 export const OFFER_STATUS_OPTIONS = OFFER_STATUSES;
+
+// Raw API response shapes (snake_case from the server)
+
+export type ApiOffersTrend = {
+  direction: "up" | "down" | null;
+  change_percent: number | null;
+};
+
+export type ApiOffersStatMetric = {
+  value: number;
+  trend?: ApiOffersTrend;
+};
+
+export type ApiOffersStats = {
+  total_offers_sent: ApiOffersStatMetric;
+  offer_to_acceptance_rate: ApiOffersStatMetric;
+  offer_to_hire_rate: ApiOffersStatMetric;
+  avg_time_offer_to_hire_days: ApiOffersStatMetric;
+};
+
+export type ApiOffersFunnelStage = {
+  stage: string;
+  count: number;
+  drop_off_percent?: number;
+};
+
+export type ApiOffersFunnel = {
+  stages: ApiOffersFunnelStage[];
+  total: number;
+  empty: boolean;
+};
+
+export type ApiOffer = {
+  id: string;
+  candidate_name: string;
+  employer_name: string;
+  role_title: string;
+  status: string;
+  date_sent: string;
+  date_resolved: string | null;
+};
+
+export type ApiOffersList = {
+  offers: ApiOffer[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    total_pages?: number;
+    totalPages?: number;
+  };
+};
