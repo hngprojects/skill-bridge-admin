@@ -9,9 +9,9 @@ import {
   ChangeEmailDialog,
   ChangeRoleDialog,
   ResetPasswordDialog,
-  ToggleActivationDialog,
 } from "./admin-action-dialogs";
 import { getAdminAccountColumns } from "./columns";
+import { ToggleActivationDialog } from "./admin-toggle-activation-modal";
 
 type ActionType = "reset" | "email" | "role" | "deactivate" | "reactivate";
 
