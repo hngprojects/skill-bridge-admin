@@ -3,7 +3,6 @@
 import * as React from "react";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -57,10 +56,15 @@ export function ResetPasswordDialog({ admin, open, onClose }: DialogProps) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => admin && mutation.mutate(admin.id)}>
-            Reset Password
-          </AlertDialogAction>
+          <AlertDialogCancel disabled={mutation.isPending}>
+            Cancel
+          </AlertDialogCancel>
+          <Button
+            onClick={() => admin && mutation.mutate(admin.id)}
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? "Resetting…" : "Reset Password"}
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -112,6 +116,7 @@ export function ChangeEmailDialog({ admin, open, onClose }: DialogProps) {
             <Input
               id="new-email"
               type="email"
+              required
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
             />

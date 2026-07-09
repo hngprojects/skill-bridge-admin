@@ -21,6 +21,18 @@ function fail(message: string): AdminManagementResult {
   return { ok: false, message };
 }
 
+async function callAdminApi(
+  request: () => Promise<unknown>,
+  successMessage: string,
+): Promise<AdminManagementResult> {
+  try {
+    await request();
+    return ok(successMessage);
+  } catch (err) {
+    return fail(toApiError(err).message);
+  }
+}
+
 export async function getAdminAccounts(
   params: AdminAccountsQueryParams = {},
 ): Promise<AdminAccountsPage> {
@@ -34,70 +46,60 @@ export async function getAdminAccounts(
 export async function inviteAdmin(
   input: InviteAdminInput,
 ): Promise<AdminManagementResult> {
-  try {
-    await authApi.post("/admin/admins/invite", { email: input.email });
-    return ok(`Invite sent to ${input.email}.`);
-  } catch (err) {
-    return fail(toApiError(err).message);
-  }
+  return callAdminApi(
+    () => authApi.post("/admin/admins/invite", { email: input.email }),
+    `Invite sent to ${input.email}.`,
+  );
 }
 
 export async function resetAdminPassword(
   id: string,
 ): Promise<AdminManagementResult> {
-  try {
-    await authApi.post(`/admin/admins/${id}/reset-password`);
-    return ok("Password reset email sent.");
-  } catch (err) {
-    return fail(toApiError(err).message);
-  }
+  return callAdminApi(
+    () => authApi.post(`/admin/admins/${id}/reset-password`),
+    "Password reset email sent.",
+  );
 }
 
 export async function changeAdminEmail(
   input: ChangeAdminEmailInput,
 ): Promise<AdminManagementResult> {
-  try {
-    await authApi.patch(`/admin/admins/${input.id}/email`, {
-      email: input.email,
-    });
-    return ok("Email updated successfully.");
-  } catch (err) {
-    return fail(toApiError(err).message);
-  }
+  return callAdminApi(
+    () =>
+      authApi.patch(`/admin/admins/${input.id}/email`, {
+        email: input.email,
+      }),
+    "Email updated successfully.",
+  );
 }
 
 export async function changeAdminRole(
   input: ChangeAdminRoleInput,
 ): Promise<AdminManagementResult> {
-  try {
-    await authApi.patch(`/admin/admins/${input.id}/role`, {
-      role: input.role,
-      confirm_downgrade: input.confirm_downgrade,
-    });
-    return ok("Role updated successfully.");
-  } catch (err) {
-    return fail(toApiError(err).message);
-  }
+  return callAdminApi(
+    () =>
+      authApi.patch(`/admin/admins/${input.id}/role`, {
+        role: input.role,
+        confirm_downgrade: input.confirm_downgrade,
+      }),
+    "Role updated successfully.",
+  );
 }
 
 export async function deactivateAdminAccount(
   id: string,
 ): Promise<AdminManagementResult> {
-  try {
-    await authApi.patch(`/admin/admins/${id}/deactivate`);
-    return ok("Account deactivated.");
-  } catch (err) {
-    return fail(toApiError(err).message);
-  }
+  return callAdminApi(
+    () => authApi.patch(`/admin/admins/${id}/deactivate`),
+    "Account deactivated.",
+  );
 }
 
 export async function reactivateAdminAccount(
   id: string,
 ): Promise<AdminManagementResult> {
-  try {
-    await authApi.patch(`/admin/admins/${id}/reactivate`);
-    return ok("Account reactivated.");
-  } catch (err) {
-    return fail(toApiError(err).message);
-  }
+  return callAdminApi(
+    () => authApi.patch(`/admin/admins/${id}/reactivate`),
+    "Account reactivated.",
+  );
 }
