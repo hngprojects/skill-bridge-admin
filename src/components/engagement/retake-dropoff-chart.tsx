@@ -9,11 +9,17 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyTitle,
+  EmptyDescription,
+} from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRetakeDropoff } from "@/hooks/api/use-engagement";
 
 const chartConfig = {
-  candidates: {
+  retakes: {
     label: "Candidates",
     color: "#663f85",
   },
@@ -21,7 +27,7 @@ const chartConfig = {
 
 export function RetakeDropoffChart() {
   const { data, isLoading } = useRetakeDropoff();
-  const chartData = data?.data ?? [];
+  const chartData = data?.buckets ?? [];
 
   return (
     <Card>
@@ -32,12 +38,17 @@ export function RetakeDropoffChart() {
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-72 w-full rounded-xl" />
-        ) : chartData.length === 0 ? (
-          <div className="flex h-72 items-center justify-center rounded-xl border border-dashed border-border">
-            <p className="text-sm text-muted-foreground">
-              Not enough retake data yet.
-            </p>
-          </div>
+        ) : data?.empty || chartData.length === 0 ? (
+          <Empty className="h-72 border-0">
+            <EmptyHeader>
+              <EmptyTitle className="text-sm font-medium">
+                Not enough data yet
+              </EmptyTitle>
+              <EmptyDescription>
+                {data?.empty_message ?? "Not enough retake data yet."}
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <ChartContainer config={chartConfig} className="h-72 w-full">
             <BarChart data={chartData} barSize={36}>
@@ -47,6 +58,7 @@ export function RetakeDropoffChart() {
                 tickLine={false}
                 axisLine={false}
                 tick={{ fontSize: 11 }}
+                tickFormatter={(value) => `Attempt ${value}`}
               />
               <YAxis
                 tickLine={false}
@@ -56,8 +68,8 @@ export function RetakeDropoffChart() {
               />
               <ChartTooltip content={<ChartTooltipContent />} />
               <Bar
-                dataKey="candidates"
-                fill="var(--color-candidates)"
+                dataKey="retakes"
+                fill="var(--color-retakes)"
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>

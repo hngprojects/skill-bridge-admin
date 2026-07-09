@@ -17,9 +17,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyTitle,
+  EmptyDescription,
+} from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMinorAssessmentUptake } from "@/hooks/api/use-engagement";
-import { TALENT_TRACKS } from "@/types/api/talents";
+import { TALENT_TRACKS, TRACK_LABELS } from "@/types/api/talents";
 
 const chartConfig = {
   count: {
@@ -32,7 +38,7 @@ export function MinorAssessmentUptakeChart() {
   const [track, setTrack] = React.useState("all");
   const { data, isLoading } = useMinorAssessmentUptake(track);
 
-  const chartData = data?.data ?? [];
+  const chartData = data?.buckets ?? [];
 
   return (
     <Card>
@@ -48,7 +54,7 @@ export function MinorAssessmentUptakeChart() {
               <SelectItem value="all">All Tracks</SelectItem>
               {TALENT_TRACKS.map((trackOption) => (
                 <SelectItem key={trackOption} value={trackOption}>
-                  {trackOption}
+                  {TRACK_LABELS[trackOption]}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -59,12 +65,17 @@ export function MinorAssessmentUptakeChart() {
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-72 w-full rounded-xl" />
-        ) : chartData.length === 0 ? (
-          <div className="flex h-72 items-center justify-center rounded-xl border border-dashed border-border">
-            <p className="text-sm text-muted-foreground">
-              No minor assessment data yet.
-            </p>
-          </div>
+        ) : data?.empty || chartData.length === 0 ? (
+          <Empty className="h-72 border-0">
+            <EmptyHeader>
+              <EmptyTitle className="text-sm font-medium">
+                Not enough data yet
+              </EmptyTitle>
+              <EmptyDescription>
+                {data?.empty_message ?? "No minor assessment data yet."}
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <ChartContainer config={chartConfig} className="h-72 w-full">
             <BarChart data={chartData} barSize={36}>
