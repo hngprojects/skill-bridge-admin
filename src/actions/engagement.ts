@@ -1,27 +1,36 @@
+"use server";
+
+import type { ApiEnvelope } from "@/types/api";
 import type {
   EngagementStats,
   MinorAssessmentUptakeData,
+  Nested,
   RetakeDropoffData,
 } from "@/types/api/engagement";
-
-import {
-  getMockMinorAssessmentUptake,
-  MOCK_ENGAGEMENT_STATS,
-  MOCK_RETAKE_DROPOFF,
-} from "@/mocks/engagement";
-
-// TODO: replace mock bodies with real API calls once endpoints are available.
+import { authApi } from "@/lib/api/clients";
+import { unwrapData } from "./utils";
 
 export async function getEngagementStats(): Promise<EngagementStats> {
-  return MOCK_ENGAGEMENT_STATS;
+  const res = await authApi.get<ApiEnvelope<Nested<EngagementStats>>>(
+    "/admin/engagement/stats",
+  );
+  return unwrapData(res).data;
 }
 
 export async function getRetakeDropoff(): Promise<RetakeDropoffData> {
-  return MOCK_RETAKE_DROPOFF;
+  const res = await authApi.get<ApiEnvelope<Nested<RetakeDropoffData>>>(
+    "/admin/engagement/retake-dropoff",
+  );
+  return unwrapData(res).data;
 }
 
 export async function getMinorAssessmentUptake(
   track = "all",
 ): Promise<MinorAssessmentUptakeData> {
-  return getMockMinorAssessmentUptake(track);
+  const params = track && track !== "all" ? { track } : undefined;
+  const res = await authApi.get<ApiEnvelope<Nested<MinorAssessmentUptakeData>>>(
+    "/admin/engagement/minor-uptake",
+    { params },
+  );
+  return unwrapData(res).data;
 }
