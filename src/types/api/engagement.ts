@@ -1,41 +1,32 @@
+import type { StatMetric } from "./overview";
+
+export type Nested<T> = { status: string; data: T };
+
 export type EngagementStats = {
-  minorAssessmentAdoptionRate: {
-    value: number;
-    trend: number;
-  };
-  minorAssessmentCompletionRate: {
-    value: number;
-    trend: number;
-  };
-  retakeConversionRate: {
-    value: number;
-    trend: number;
-  };
-  averageTimeToRetakeAfterGateClears: {
-    value: string;
-    trend: number;
-  };
+  minor_assessment_adoption_rate: StatMetric;
+  minor_assessment_completion_rate: StatMetric;
+  retake_conversion_rate: StatMetric;
+  avg_time_to_retake_after_gate_clears_days: StatMetric;
 };
 
-export type RetakeDropoffDataPoint = {
-  attempt: string;
-  candidates: number;
+export type RetakeDropoffBucket = {
+  attempt: number;
+  retakes: number;
 };
 
 export type RetakeDropoffData = {
-  data: RetakeDropoffDataPoint[];
+  buckets: RetakeDropoffBucket[];
+  empty: boolean;
+  empty_message: string;
 };
 
-export type MinorAssessmentUptakeType =
-  | "Language variants"
-  | "Specialisation deep dives"
-  | "Soft skill assessments";
-
-export type MinorAssessmentUptakeDataPoint = {
-  type: MinorAssessmentUptakeType;
+export type MinorAssessmentUptakeBucket = {
+  type: string;
   count: number;
 };
 
 export type MinorAssessmentUptakeData = {
-  data: MinorAssessmentUptakeDataPoint[];
+  buckets: MinorAssessmentUptakeBucket[];
+  empty: boolean;
+  empty_message: string;
 };
