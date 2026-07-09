@@ -25,7 +25,10 @@ import type {
   AdminAccountStatus,
   ManagedAdminAccount,
 } from "@/types/api/admin-management";
-import { ADMIN_ROLE_LABELS } from "@/types/api/admin-management";
+import {
+  ADMIN_ROLE_LABELS,
+  ADMIN_STATUS_LABELS,
+} from "@/types/api/admin-management";
 import type { AdminRole } from "@/types/api/auth";
 
 const roleVariantMap: Record<AdminRole, StatusPillVariant> = {
@@ -35,9 +38,9 @@ const roleVariantMap: Record<AdminRole, StatusPillVariant> = {
 };
 
 const statusVariantMap: Record<AdminAccountStatus, StatusPillVariant> = {
-  Active: "success",
-  "Pending Setup": "warning",
-  Deactivated: "error",
+  active: "success",
+  pending_setup: "warning",
+  deactivated: "error",
 };
 
 type AdminColumnsParams = {
@@ -78,15 +81,14 @@ export function getAdminAccountColumns({
       ),
     },
     {
-      accessorKey: "lastLogin",
+      accessorKey: "last_login",
       header: "Last Login",
       enableSorting: true,
-      cell: ({ row }) =>
-        row.original.lastLogin ? (
-          format(new Date(row.original.lastLogin), "MMM d, yyyy · h:mm a")
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        ),
+      cell: ({ row }) => {
+        const date = row.original.last_login;
+        if (!date) return <span className="text-muted-foreground">—</span>;
+        return format(new Date(date), "MMM d, yyyy · h:mm a");
+      },
     },
     {
       accessorKey: "status",
@@ -94,7 +96,7 @@ export function getAdminAccountColumns({
       enableSorting: true,
       cell: ({ row }) => (
         <StatusPill
-          status={row.original.status}
+          status={ADMIN_STATUS_LABELS[row.original.status]}
           variant={statusVariantMap[row.original.status]}
         />
       ),
@@ -105,7 +107,7 @@ export function getAdminAccountColumns({
       enableSorting: false,
       cell: ({ row }) => {
         const admin = row.original;
-        const isDeactivated = admin.status === "Deactivated";
+        const isDeactivated = admin.status === "deactivated";
 
         return (
           <div className="flex justify-end">

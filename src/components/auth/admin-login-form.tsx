@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 
-import { login } from "@/actions/auth";
+import { login, type LoginResult } from "@/actions/auth";
 import { FormInput } from "@/components/custom/form-input";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -38,31 +38,41 @@ export function AdminLoginForm() {
   async function onSubmit(values: AdminLoginFormValues) {
     setFormError(null);
 
-    let user: Awaited<ReturnType<typeof login>>["user"];
+    let result: LoginResult;
     try {
-      const data = await login({
+      result = await login({
         email: values.email,
         password: values.password,
       });
-      user = data.user;
-    } catch (err) {
-      setFormError(
-        err instanceof Error
-          ? err.message
-          : "Something went wrong. Please try again.",
-      );
+    } catch {
+      setFormError("Something went wrong. Please try again.");
       return;
     }
 
-    const signInResult = await signIn("credentials", {
-      sessionUser: "true",
-      userId: user.id,
-      email: user.email,
-      name: user.fullname,
-      image: user.avatar_url ?? undefined,
-      role: user.admin_tier ?? user.role,
-      redirect: false,
-    });
+    if (!result.success) {
+      setFormError(result.error);
+      return;
+    }
+
+    const { user } = result.data;
+
+    let signInResult: Awaited<ReturnType<typeof signIn>>;
+    try {
+      signInResult = await signIn("credentials", {
+        sessionUser: "true",
+        userId: user.id,
+        email: user.email,
+        name: user.fullname,
+        image: user.avatar_url ?? undefined,
+        role: user.admin_tier ?? user.role,
+        redirect: false,
+      });
+    } catch {
+      setFormError(
+        "Signed in with the API, but couldn't start your session. Try again.",
+      );
+      return;
+    }
 
     if (signInResult?.error) {
       setFormError(
