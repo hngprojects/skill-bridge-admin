@@ -7,6 +7,7 @@ import type {
   RefreshResponseData,
 } from "@/types/api/auth";
 import { publicApi } from "@/lib/api/clients";
+import { toApiError } from "@/lib/api/errors";
 import {
   getServerCookieHeader,
   parseSetCookieHeader,
@@ -15,11 +16,23 @@ import {
 } from "@/lib/api/cookies";
 import { unwrapData } from "./utils";
 
-export async function login(body: LoginInput): Promise<LoginResponseData> {
-  const res = await publicApi.post<ApiEnvelope<LoginResponseData>>(
-    "/admin/auth/login",
-    body,
-  );
+export type LoginResult =
+  | { success: true; data: LoginResponseData }
+  | { success: false; error: string };
+
+export async function login(body: LoginInput): Promise<LoginResult> {
+  let res: Awaited<
+    ReturnType<typeof publicApi.post<ApiEnvelope<LoginResponseData>>>
+  >;
+
+  try {
+    res = await publicApi.post<ApiEnvelope<LoginResponseData>>(
+      "/admin/auth/login",
+      body,
+    );
+  } catch (err) {
+    return { success: false, error: toApiError(err).message };
+  }
 
   // Forward API auth cookies to the browser so subsequent server-action API
   // calls can read and proxy them via getServerCookieHeader().
@@ -28,14 +41,15 @@ export async function login(body: LoginInput): Promise<LoginResponseData> {
     .filter((c): c is NonNullable<typeof c> => c != null);
 
   if (cookies.length === 0) {
-    throw new Error(
-      "Authentication failed: no session cookies returned by the API.",
-    );
+    return {
+      success: false,
+      error: "Authentication failed: no session cookies returned by the API.",
+    };
   }
 
   await persistServerCookies(cookies);
 
-  return unwrapData(res);
+  return { success: true, data: unwrapData(res) };
 }
 
 export async function refreshTokens(): Promise<RefreshResponseData> {
